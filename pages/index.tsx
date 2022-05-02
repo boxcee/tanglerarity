@@ -5,7 +5,7 @@ import styles from '../styles/Home.module.css'
 import Link from 'next/link';
 import web3 from 'web3';
 import {FormEvent, useState} from "react";
-import {useRouter} from 'next/router'
+import {useRouter} from 'next/router';
 
 const Home: NextPage = () => {
     const router = useRouter();
@@ -45,14 +45,13 @@ const Home: NextPage = () => {
 
             <footer className={styles.footer}>
                 <a
-                    href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
+                    href="https://github.com/boxcee/tanglerarity"
                     target="_blank"
                     rel="noopener noreferrer"
                 >
-                    Powered by{' '}
                     <span className={styles.logo}>
-            <Image src="/vercel.svg" alt="Vercel Logo" width={72} height={16} />
-          </span>
+                        <Image src="/github.svg" alt="Github Logo" width={32} height={32} />
+                    </span>
                 </a>
             </footer>
         </div>
