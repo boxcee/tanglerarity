@@ -1,0 +1,34 @@
+{
+  "total": 4200,
+  "properties": {
+    "accessory": {
+      "samurai helmet": 0.0212,
+      "crown": 0.0257,
+      "ninja hood": 0.0329,
+      "gold chain": 0.0464,
+      "panda hat": 0.0483,
+      "farmers hat": 0.1036,
+      "ragband": 0.1102,
+      "mohawk": 0.1112,
+      "onihorn": 0.1124,
+      "headband": 0.1181,
+      "none": 0.27
+    },
+    "background": {
+      "space": 0.0317,
+      "squiggles": 0.0917,
+      "blobs": 0.057
+    },
+    "body": {
+    },
+    "eyes": {
+    },
+    "mouth": {
+    },
+    "outfit": {
+    },
+    "weapon": {
+    }
+  }
+}
+
