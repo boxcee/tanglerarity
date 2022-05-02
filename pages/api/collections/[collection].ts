@@ -22,7 +22,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const enrichedNfts = enrichNftsWithRarityScores(newNfts);
         nfts = await createNfts(enrichedNfts);
     }
-    nfts = nfts.slice(skip, skip + limit);
 
     res.status(200).json({total, nfts});
 };

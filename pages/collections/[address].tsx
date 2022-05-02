@@ -9,16 +9,10 @@ import {NextPage} from "next";
 import {useEffect, useState} from "react";
 import {RankedNft} from "../../types/RankedNft";
 
-type Nft = {
-    name: string,
-    media: string,
-    uid: string,
-    owner: string
-}
-
 type AddressProps = {
     address: string,
-    limit: number
+    limit: number,
+    skip: number
 }
 
 type AddressContext = {
@@ -27,23 +21,24 @@ type AddressContext = {
     },
     query: {
         limit: number,
+        skip: number
     }
 }
 
-const Address: NextPage<AddressProps> = ({address, limit}) => {
+const Address: NextPage<AddressProps> = ({address, limit, skip}) => {
     const router = useRouter();
     const [isLoading, setLoading] = useState(true);
     const [nftData, setNftData] = useState({} as ({ total: number, nfts: RankedNft[] }));
 
     useEffect(() => {
         setLoading(true);
-        fetch('/api/collections/' + address + '?limit=' + limit)
+        fetch('/api/collections/' + address + '?limit=' + limit + '&skip=' + skip)
             .then(res => res.json())
             .then(data => {
                 setNftData(data);
                 setLoading(false);
             });
-    }, [address, limit]);
+    }, [address, limit, skip]);
 
     if (isLoading) {
         return <div>Loading...</div>;
@@ -86,7 +81,7 @@ const Address: NextPage<AddressProps> = ({address, limit}) => {
 
 export async function getServerSideProps({params, query}: AddressContext) {
     return {
-        props: {address: params.address, limit: query.limit},
+        props: {address: params.address, limit: query.limit || 15, skip: query.skip || 0},
     }
 }
 
