@@ -1,6 +1,7 @@
 import {Soon} from 'soonaverse';
-import {useEffect, useState} from "react";
 import Image from 'next/image';
+import fs from 'fs';
+import path from 'path';
 
 const soon = new Soon();
 
@@ -24,7 +25,7 @@ type RarityProperties = {
 
 type RarityProps = {
     properties: RarityProperties,
-    collection: string,
+    rarity: RarityScores,
     media: string
 }
 
@@ -33,24 +34,7 @@ type RarityParams = {
 }
 
 function Address(props: RarityProps) {
-    const [rarity, setRarity] = useState({} as RarityScores);
-    const [isLoading, setLoading] = useState(true)
-
-    const {properties, collection} = props;
-
-    useEffect(() => {
-        setLoading(true);
-        fetch('/api/rarities/' + collection)
-            .then((res) => res.json())
-            .then((data) => {
-                setRarity(data);
-                setLoading(false);
-            })
-    }, [collection]);
-
-    if (isLoading) {
-        return <div>Loading rarity score for NFT...</div>;
-    }
+    const {properties, rarity} = props;
 
     let score = 0;
     Object.values(properties).map(({label, value}) => {
@@ -79,8 +63,10 @@ function Address(props: RarityProps) {
 export async function getServerSideProps({params}: { params: RarityParams }) {
     const {address} = params;
     const nft = await soon.getNft(address);
-    const {properties, collection, media}: { properties: RarityProperties, collection: string, media: string } = nft;
-    return {props: {properties, collection, media}};
+    const jsonPath = path.join(process.cwd(), 'rarities', nft.collection + '.json');
+    const jsonFile = fs.readFileSync(jsonPath, 'utf-8');
+    const {properties, media}: { properties: RarityProperties, media: string } = nft;
+    return {props: {properties, rarity: JSON.parse(jsonFile), media}};
 }
 
 export default Address;
