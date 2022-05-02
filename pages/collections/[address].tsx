@@ -1,6 +1,3 @@
-import fs from 'fs';
-import path from 'path';
-import {Soon} from 'soonaverse';
 import ImageList from "@mui/material/ImageList";
 import ImageListItem from "@mui/material/ImageListItem";
 import Image from 'next/image';
@@ -8,8 +5,8 @@ import ImageListItemBar from "@mui/material/ImageListItemBar";
 import IconButton from "@mui/material/IconButton";
 import InfoIcon from '@mui/icons-material/Info';
 import {useRouter} from "next/router";
-
-const soon = new Soon();
+import {NextPage} from "next";
+import {useEffect, useState} from "react";
 
 type Nft = {
     name: string,
@@ -18,12 +15,34 @@ type Nft = {
     owner: string
 }
 
-type AddressParams = {
+type AddressProps = {
     address: string
 }
 
-function Address({nfts = []}: { nfts: Nft[] }) {
+type AddressContext = {
+    params: {
+        address: string
+    }
+}
+
+const Address: NextPage<AddressProps> = ({address}) => {
     const router = useRouter();
+    const [isLoading, setLoading] = useState(true);
+    const [nfts, setNfts] = useState([]);
+
+    useEffect(() => {
+        setLoading(true);
+        fetch('/api/collections/' + address + '?limit=15')
+            .then(res => res.json())
+            .then(data => {
+                setNfts(data);
+                setLoading(false);
+            });
+    }, [address]);
+
+    if (isLoading) {
+        return <div>Loading...</div>;
+    }
 
     const handleInfoClick = (uid: string) => {
         router.push('/nfts/' + uid);
@@ -58,17 +77,10 @@ function Address({nfts = []}: { nfts: Nft[] }) {
     </div>;
 }
 
-export async function getStaticPaths() {
-    const files = fs.readdirSync(path.join(process.cwd(), 'rarities'));
+export async function getServerSideProps({params}: AddressContext) {
     return {
-        paths: files.map(filename => '/collections/' + filename.split('.')[0]),
-        fallback: true // false or 'blocking'
-    };
-}
-
-export async function getStaticProps({params}: { params: AddressParams }) {
-    const nfts = await soon.getNftsByCollections([params.address]);
-    return {props: {nfts: nfts.map(({name, media, owner, uid}) => ({name, media, owner, uid}))}};
+        props: {address: params.address},
+    }
 }
 
 

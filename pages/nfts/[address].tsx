@@ -2,9 +2,10 @@ import {Soon} from 'soonaverse';
 import Image from 'next/image';
 import fs from 'fs';
 import path from 'path';
-import calculator from "../../utils/calculator";
+import {rarity} from "../../lib/utils/rarity";
 import styles from '../../styles/Address.module.css'
 import {Nft} from "soonaverse/dist/interfaces/models/nft";
+import {NextPage} from "next";
 
 const soon = new Soon();
 
@@ -26,10 +27,8 @@ type RarityParams = {
     address: string
 }
 
-function Address(props: RarityProps) {
+const Address: NextPage<RarityProps> = (props: RarityProps) => {
     const {score, nft} = props;
-
-    console.log(nft);
 
     return (
         <div className={styles.container}>
@@ -59,7 +58,7 @@ export async function getServerSideProps({params}: { params: RarityParams }) {
     try {
         const jsonPath = path.join(process.cwd(), 'rarities', nft.collection + '.json');
         const jsonFile = fs.readFileSync(jsonPath, 'utf-8');
-        score = nft.properties ? calculator(nft.properties, JSON.parse(jsonFile)) : 0;
+        score = nft.properties ? rarity(nft.properties, JSON.parse(jsonFile)) : 0;
     } catch (err) {
         console.error(err);
     }
