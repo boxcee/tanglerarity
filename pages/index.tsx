@@ -6,6 +6,9 @@ import Link from 'next/link';
 import web3 from 'web3';
 import {FormEvent, useState} from "react";
 import {useRouter} from 'next/router';
+import Button from '@mui/material/Button';
+import TextField from '@mui/material/TextField';
+import Box from '@mui/material/Box';
 
 const Home: NextPage = () => {
     const router = useRouter();
@@ -16,7 +19,7 @@ const Home: NextPage = () => {
         if (!web3.utils.isAddress(address)) {
             alert('Not a avalid address');
         } else {
-            router.push('/nft/' + address);
+            router.push('/nfts/' + address);
         }
     };
 
@@ -33,12 +36,17 @@ const Home: NextPage = () => {
                     Welcome to <Link href="/">TangleRarity!</Link>
                 </h1>
 
+                <Box>
+                    <TextField id="outlined-basic" label="Outlined" variant="outlined" />
+                    <Button variant='contained'>Submit</Button>
+                </Box>
+
                 <div className={styles.description}>
                     <form onSubmit={handleOnSubmit}>
                         <label htmlFor="address">Address</label>
                         <input id="address" type="text" autoComplete="address" required
                                onChange={e => setAddress(e.currentTarget.value)} value={address} />
-                        <button type="submit">Calculate</button>
+                        <Button variant='contained'>Submit</Button>
                     </form>
                 </div>
             </main>
