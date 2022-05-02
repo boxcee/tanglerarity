@@ -43,7 +43,7 @@ function Address(props: RarityProps) {
                     height={300}
                 />
                 {score ? <div className={styles.score}>Score: {score.toFixed(2)}</div> :
-                    <div>Rarity scores haven't been uploaded yet. To add your rarity scores, please submit a <a
+                    <div>Rarity scores haven&apos;t been uploaded yet. To add your rarity scores, please submit a <a
                         href='https://github.com/boxcee/tanglerarity/new/main/rarities'>pull request</a>.</div>}
             </main>
         </div>
@@ -52,7 +52,7 @@ function Address(props: RarityProps) {
 
 export async function getServerSideProps({params}: { params: RarityParams }) {
     const {address} = params;
-    const {createdOn, updatedOn, soldOn, ...nft} = await soon.getNft(address);
+    const {createdOn, updatedOn, soldOn, ...nft}: Nft & { soldOn?: string } = await soon.getNft(address);
     const collection = await soon.getCollection(nft.collection);
     console.log(collection);
     let score = 0;

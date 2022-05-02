@@ -11,16 +11,27 @@ import {useRouter} from "next/router";
 
 const soon = new Soon();
 
-function Address({nfts = []}) {
+type Nft = {
+    name: string,
+    media: string,
+    uid: string,
+    owner: string
+}
+
+type AddressParams = {
+    address: string
+}
+
+function Address({nfts = []}: { nfts: Nft[] }) {
     const router = useRouter();
 
-    const handleInfoClick = (uid) => {
+    const handleInfoClick = (uid: string) => {
         router.push('/nfts/' + uid);
     };
 
     return <div>
         <ImageList sx={{width: 750, height: 750}} cols={3} rowHeight={250}>
-            {nfts.map((nft) => (
+            {nfts.map((nft: Nft) => (
                 <ImageListItem key={nft.name}>
                     <Image
                         loader={() => nft.media}
@@ -55,7 +66,7 @@ export async function getStaticPaths() {
     };
 }
 
-export async function getStaticProps({params}) {
+export async function getStaticProps({params}: { params: AddressParams }) {
     const nfts = await soon.getNftsByCollections([params.address]);
     return {props: {nfts: nfts.map(({name, media, owner, uid}) => ({name, media, owner, uid}))}};
 }
