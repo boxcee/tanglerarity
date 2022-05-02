@@ -1,6 +1,6 @@
 import {Soon} from 'soonaverse';
 import {useEffect, useState} from "react";
-
+import Image from 'next/image';
 
 const soon = new Soon();
 
@@ -24,7 +24,8 @@ type RarityProperties = {
 
 type RarityProps = {
     properties: RarityProperties,
-    collection: string
+    collection: string,
+    media: string
 }
 
 type RarityParams = {
@@ -52,7 +53,6 @@ function Address(props: RarityProps) {
     }
 
     let score = 0;
-
     Object.values(properties).map(({label, value}) => {
         if (rarity.properties[label] && rarity.properties[label][value]) {
             score += 1 / ((rarity.properties[label][value] * rarity.total) / rarity.total);
@@ -60,18 +60,27 @@ function Address(props: RarityProps) {
     });
 
     return <div>
+        <Image
+            loader={() => props.media}
+            src='nft.png'
+            alt="NFT media"
+            width={300}
+            height={300}
+        />
         <ul>
             {Object.values(properties).map(({label, value}) => {
                 return <li key={label}>{label}: {value}</li>
             })}
         </ul>
+        <div>Score: {score.toFixed(2)}</div>
     </div>
 }
 
 export async function getServerSideProps({params}: { params: RarityParams }) {
     const {address} = params;
-    const {properties, collection}: { properties: RarityProperties, collection: string } = await soon.getNft(address);
-    return {props: {properties, collection}};
+    const nft = await soon.getNft(address);
+    const {properties, collection, media}: { properties: RarityProperties, collection: string, media: string } = nft;
+    return {props: {properties, collection, media}};
 }
 
 export default Address;
