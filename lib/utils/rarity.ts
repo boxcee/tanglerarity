@@ -1,4 +1,6 @@
 import {Nft} from "soonaverse/dist/interfaces/models/nft";
+import {RankedNft} from "../../types/RankedNft";
+import {EnrichedNft} from "../../types/EnrichedNft";
 
 type RarityScores = {
     total: number,
@@ -49,19 +51,6 @@ const getTotalRarityScores = (nfts: Nft[]) => {
         return obj;
     }, {} as { [key: string]: { [key: string]: number } });
 };
-
-type EnrichedNft = Nft & {
-    score: number,
-    rarity: {
-        [key: string]: {
-            [key: string]: number
-        }
-    }
-}
-
-type RankedNft = EnrichedNft & {
-    rank: number
-}
 
 const enrichNftsWithRarityScores = (nfts: Nft[]): RankedNft[] => {
     const totalRarity = getTotalRarityScores(nfts);

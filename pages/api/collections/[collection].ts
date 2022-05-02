@@ -16,14 +16,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         collection = await createCollection(newCollection);
     }
 
-    let nfts = await getNfts(uid, limit, skip);
+    let {total, nfts} = await getNfts(uid, limit, skip);
     if ((!nfts || nfts.length === 0) && (collection.total === collection.sold)) {
         const newNfts = await soon.getNftsByCollections([uid]);
         const enrichedNfts = enrichNftsWithRarityScores(newNfts);
         nfts = await createNfts(enrichedNfts);
-        console.log(nfts[0]);
     }
     nfts = nfts.slice(skip, skip + limit);
 
-    res.status(200).json(nfts);
+    res.status(200).json({total, nfts});
 };

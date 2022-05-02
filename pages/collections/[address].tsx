@@ -7,6 +7,7 @@ import InfoIcon from '@mui/icons-material/Info';
 import {useRouter} from "next/router";
 import {NextPage} from "next";
 import {useEffect, useState} from "react";
+import {RankedNft} from "../../types/RankedNft";
 
 type Nft = {
     name: string,
@@ -16,29 +17,33 @@ type Nft = {
 }
 
 type AddressProps = {
-    address: string
+    address: string,
+    limit: number
 }
 
 type AddressContext = {
     params: {
-        address: string
+        address: string,
+    },
+    query: {
+        limit: number,
     }
 }
 
-const Address: NextPage<AddressProps> = ({address}) => {
+const Address: NextPage<AddressProps> = ({address, limit}) => {
     const router = useRouter();
     const [isLoading, setLoading] = useState(true);
-    const [nfts, setNfts] = useState([]);
+    const [nftData, setNftData] = useState({} as ({ total: number, nfts: RankedNft[] }));
 
     useEffect(() => {
         setLoading(true);
-        fetch('/api/collections/' + address + '?limit=15')
+        fetch('/api/collections/' + address + '?limit=' + limit)
             .then(res => res.json())
             .then(data => {
-                setNfts(data);
+                setNftData(data);
                 setLoading(false);
             });
-    }, [address]);
+    }, [address, limit]);
 
     if (isLoading) {
         return <div>Loading...</div>;
@@ -48,9 +53,11 @@ const Address: NextPage<AddressProps> = ({address}) => {
         router.push('/nfts/' + uid);
     };
 
+    const {total, nfts} = nftData;
+
     return <div>
         <ImageList sx={{width: 750, height: 750}} cols={3} rowHeight={250}>
-            {nfts.map((nft: Nft) => (
+            {nfts.map((nft: RankedNft) => (
                 <ImageListItem key={nft.name}>
                     <Image
                         loader={() => nft.media}
@@ -60,7 +67,7 @@ const Address: NextPage<AddressProps> = ({address}) => {
                     />
                     <ImageListItemBar
                         title={nft.name}
-                        subtitle={nft.owner}
+                        subtitle={`Rank: ${nft.rank}/${total}; Score: ${nft.score.toFixed(2)}`}
                         actionIcon={
                             <IconButton
                                 sx={{color: 'rgba(255, 255, 255, 0.54)'}}
@@ -77,9 +84,9 @@ const Address: NextPage<AddressProps> = ({address}) => {
     </div>;
 }
 
-export async function getServerSideProps({params}: AddressContext) {
+export async function getServerSideProps({params, query}: AddressContext) {
     return {
-        props: {address: params.address},
+        props: {address: params.address, limit: query.limit},
     }
 }
 
