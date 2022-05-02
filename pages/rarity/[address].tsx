@@ -31,7 +31,7 @@ type RarityParams = {
     address: string
 }
 
-function Rarity(props: RarityProps) {
+function Address(props: RarityProps) {
     const [rarity, setRarity] = useState({} as RarityScores);
     const [isLoading, setLoading] = useState(true)
 
@@ -74,4 +74,4 @@ export async function getServerSideProps({params}: { params: RarityParams }) {
     return {props: {properties, collection}};
 }
 
-export default Rarity;
+export default Address;

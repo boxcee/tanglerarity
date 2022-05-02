@@ -16,7 +16,7 @@ export default function handler(
     res: NextApiResponse<RarityTable>
 ) {
     try {
-        const jsonPath = path.join(process.cwd(), 'pages', 'rarities', req.query.collection + '.json');
+        const jsonPath = path.join(process.cwd(), 'rarities', req.query.collection + '.json');
         const jsonFile = fs.readFileSync(jsonPath, 'utf-8');
         res.status(200).json(JSON.parse(jsonFile));
     } catch (err) {
