@@ -3,24 +3,39 @@ import Head from 'next/head';
 import Image from 'next/image';
 import styles from '../styles/Home.module.css';
 import Link from 'next/link';
-import web3 from 'web3';
-import {FormEvent, useState} from 'react';
+import {ChangeEvent, Fragment, useEffect, useState} from 'react';
 import {useRouter} from 'next/router';
+import Autocomplete from '@mui/material/Autocomplete';
+import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
-import Box from '@mui/material/Box';
+import {Collection} from 'soonaverse/dist/interfaces/models';
+import {RankedNft} from '../types/RankedNft';
+import CircularProgress from '@mui/material/CircularProgress';
 
 const Home: NextPage = () => {
   const router = useRouter();
-  const [address, setAddress] = useState('');
+  const [open, setOpen] = useState(false);
+  const [options, setOptions] = useState([] as ((Collection | RankedNft) & { groupBy: string })[]);
+  const [value, setValue] = useState('');
+  const [isLoading, setLoading] = useState(false);
 
-  const handleOnSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    if (!web3.utils.isAddress(address)) {
-      alert('Not a avalid address');
+  useEffect(() => {
+    if (value.length > 2) {
+      setLoading(true);
+      fetch('/api/search?q=' + value)
+        .then(res => res.json())
+        .then(data => {
+          setLoading(false);
+          setOptions(data);
+        });
     } else {
-      router.push('/nfts/' + address);
+      setOptions([]);
     }
+  }, [value]);
+
+  const handleOnChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setValue(event.target.value);
   };
 
   return (
@@ -40,18 +55,40 @@ const Home: NextPage = () => {
           Welcome to <Link href="/">TangleRarity!</Link>
         </h1>
 
-        <Box>
-          <TextField id="outlined-basic" label="Outlined" variant="outlined" />
-          <Button variant="contained">Submit</Button>
-        </Box>
-
         <div className={styles.description}>
-          <form onSubmit={handleOnSubmit}>
-            <label htmlFor="address">Address</label>
-            <input id="address" type="text" autoComplete="address" required
-                   onChange={e => setAddress(e.currentTarget.value)} value={address} />
-            <Button variant="contained">Submit</Button>
-          </form>
+          <Stack sx={{width: 300}} spacing={2}>
+            <Autocomplete
+              freeSolo
+              id="search"
+              disableClearable
+              open={open}
+              onOpen={() => setOpen(true)}
+              onClose={() => setOpen(false)}
+              options={options}
+              getOptionLabel={option => (option as (Collection | RankedNft)).name}
+              groupBy={(option) => option.groupBy.toUpperCase()}
+              loading={isLoading}
+              filterOptions={(x) => x}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Address, name, description, etc."
+                  onChange={handleOnChange}
+                  InputProps={{
+                    ...params.InputProps,
+                    type: 'search',
+                    endAdornment: (
+                      <Fragment>
+                        {isLoading ? <CircularProgress color="inherit" size={20} /> : null}
+                        {params.InputProps.endAdornment}
+                      </Fragment>
+                    ),
+                  }}
+                />
+              )}
+            />
+            <Button variant="contained">Search</Button>
+          </Stack>
         </div>
       </main>
 

@@ -9,6 +9,7 @@ import {
   getNfts,
 } from '../../lib/mongodb/collections';
 import {enrichNftsWithRarityScores} from '../../lib/utils/rarity';
+import web3 from 'web3';
 
 const soon = new Soon();
 
@@ -48,7 +49,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const sortOrder: number = order === 'asc' ? 1 : -1;
 
   // Path is '/api/collections'
-  if (params.length === 1) {
+  if (params.length === 1 && params[0] === 'collections') {
     switch (method) {
       case 'GET':
       case 'POST':
@@ -62,7 +63,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   // Path is '/api/collections/[id]'
-  else if (params.length === 2) {
+  else if (params.length === 2 && params[0] === 'collections' && web3.utils.isAddress(params[1])) {
     const collectionId = params[1];
     switch (method) {
       case 'GET':
@@ -77,7 +78,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   // Path is '/api/collections/[id]/nfts'
-  else if (params.length === 3) {
+  else if (params.length === 3 && params[0] === 'collections' && web3.utils.isAddress(params[1]) && params[2] === 'nfts') {
     const collectionId = params[1];
     switch (method) {
       case 'GET':
@@ -92,7 +93,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   // Path is '/api/collections/[id]/nfts/[id]'
-  else if (params.length === 4) {
+  else if (params.length === 4 && params[0] === 'collections' && web3.utils.isAddress(params[1]) && params[2] === 'nfts' && web3.utils.isAddress(params[3])) {
     const collectionId = params[1];
     const nftId = params[3];
     switch (method) {
