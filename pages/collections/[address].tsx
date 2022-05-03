@@ -1,14 +1,8 @@
-import ImageList from "@mui/material/ImageList";
-import ImageListItem from "@mui/material/ImageListItem";
-import Image from 'next/image';
-import ImageListItemBar from "@mui/material/ImageListItemBar";
-import IconButton from "@mui/material/IconButton";
-import InfoIcon from '@mui/icons-material/Info';
-import {useRouter} from "next/router";
 import {NextPage} from "next";
-import {ChangeEvent, MouseEvent, useEffect, useState} from "react";
-import {RankedNft} from "../../types/RankedNft";
+import {ChangeEvent, MouseEvent, useState} from "react";
 import TablePagination from "@mui/material/TablePagination";
+import TextField from "@mui/material/TextField";
+import ImageLoader from "../../components/collections/ImageLoader";
 
 type AddressProps = {
     address: string,
@@ -27,30 +21,11 @@ type AddressContext = {
 }
 
 const Address: NextPage<AddressProps> = ({address, limit, skip}) => {
-    const router = useRouter();
-    const [isLoading, setLoading] = useState(true);
-    const [nftData, setNftData] = useState({} as ({ total: number, nfts: RankedNft[] }));
+    const [total, setTotal] = useState(0);
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(3);
+    const [filter, setFilter] = useState('');
     const columns = 3;
-
-    useEffect(() => {
-        setLoading(true);
-        fetch('/api/collections/' + address + '?limit=' + (rowsPerPage * columns) + '&skip=' + (page * rowsPerPage * columns))
-            .then(res => res.json())
-            .then(data => {
-                setNftData(data);
-                setLoading(false);
-            });
-    }, [address, rowsPerPage, columns, page]);
-
-    if (isLoading) {
-        return <div>Loading...</div>;
-    }
-
-    const handleInfoClick = (uid: string) => {
-        router.push('/nfts/' + uid + '?collection=' + address);
-    };
 
     const handleChangePage = (event: MouseEvent<HTMLButtonElement | MouseEvent> | null, page: number) => {
         setPage(page);
@@ -60,35 +35,20 @@ const Address: NextPage<AddressProps> = ({address, limit, skip}) => {
         setRowsPerPage(Number(event.target.value));
     }
 
-    const {total, nfts} = nftData;
+    const handleChangeFilter = (event: ChangeEvent<HTMLInputElement>) => {
+        setFilter(event.target.value);
+    }
+
+    const handleNftsLoaded = (total: number) => {
+        setTotal(total);
+    }
 
     return (
         <div>
-            <ImageList sx={{width: 750, height: 750}} cols={columns} rowHeight={250}>
-                {nfts.map((nft: RankedNft) => (
-                    <ImageListItem key={nft.name}>
-                        <Image
-                            loader={() => nft.media}
-                            src='nft.png'
-                            alt="NFT media"
-                            layout='fill'
-                        />
-                        <ImageListItemBar
-                            title={nft.name}
-                            subtitle={`Rank: ${nft.rank}; Score: ${nft.score.toFixed(2)}`}
-                            actionIcon={
-                                <IconButton
-                                    sx={{color: 'rgba(255, 255, 255, 0.54)'}}
-                                    aria-label={`info about ${nft.name}`}
-                                    onClick={() => handleInfoClick(nft.uid)}
-                                >
-                                    <InfoIcon />
-                                </IconButton>
-                            }
-                        />
-                    </ImageListItem>
-                ))}
-            </ImageList>
+            <TextField id="standard-basic" label="Name" variant="standard" onChange={handleChangeFilter}
+                       value={filter} />
+            <ImageLoader address={address} rowsPerPage={rowsPerPage} columns={columns} page={page} filter={filter}
+                         onNftsLoaded={handleNftsLoaded} />
             <TablePagination
                 component="div"
                 count={total}
