@@ -73,7 +73,7 @@ const enrichNftsWithRarityScores = (nfts: Nft[]): RankedNft[] => {
         return {rarity, score, ...nft};
     })
         .sort((a, b) => b.score - a.score)
-        .map((enrichedNft, idx) => ({rank: idx + 1, ...enrichedNft}));
+        .map((enrichedNft, idx) => ({rank: `${idx + 1}/${totalNfts}`, ...enrichedNft}));
 }
 
 export {rarity, enrichNftsWithRarityScores};

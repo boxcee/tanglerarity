@@ -1,34 +1,40 @@
-import {Soon} from 'soonaverse';
 import Image from 'next/image';
-import fs from 'fs';
-import path from 'path';
-import {rarity} from "../../lib/utils/rarity";
 import styles from '../../styles/Address.module.css'
-import {Nft} from "soonaverse/dist/interfaces/models/nft";
 import {NextPage} from "next";
+import {useEffect, useState} from "react";
+import {RankedNft} from "../../types/RankedNft";
 
-const soon = new Soon();
-
-type RarityProperty = {
-    label: string,
-    value: string
+type AddressProps = {
+    address: string,
+    collection: string
 }
 
-type RarityProperties = {
-    [property: string]: RarityProperty
+type AddressContext = {
+    params: {
+        address: string,
+    },
+    query: {
+        collection: string,
+    }
 }
 
-type RarityProps = {
-    nft: Nft,
-    score?: number,
-}
+const Address: NextPage<AddressProps> = ({address, collection}) => {
+    const [isLoading, setLoading] = useState(true);
+    const [nft, setNft] = useState({} as RankedNft);
 
-type RarityParams = {
-    address: string
-}
+    useEffect(() => {
+        setLoading(true);
+        fetch('/api/nfts/' + address + '?collection=' + collection)
+            .then(res => res.json())
+            .then(nft => {
+                setNft(nft);
+                setLoading(false);
+            })
+    }, [address, collection]);
 
-const Address: NextPage<RarityProps> = (props: RarityProps) => {
-    const {score, nft} = props;
+    if (isLoading) {
+        return <div>Loading...</div>;
+    }
 
     return (
         <div className={styles.container}>
@@ -41,28 +47,14 @@ const Address: NextPage<RarityProps> = (props: RarityProps) => {
                     width={300}
                     height={300}
                 />
-                {score ? <div className={styles.score}>Score: {score.toFixed(2)}</div> :
-                    <div>Rarity scores haven&apos;t been uploaded yet. To add your rarity scores, please submit a <a
-                        href='https://github.com/boxcee/tanglerarity/new/main/rarities'>pull request</a>.</div>}
+                <div className={styles.score}>Rank: {nft.rank}; Score: {nft.score.toFixed(2)}</div>
             </main>
         </div>
     );
 }
 
-export async function getServerSideProps({params}: { params: RarityParams }) {
-    const {address} = params;
-    const {createdOn, updatedOn, soldOn, ...nft}: Nft & { soldOn?: string } = await soon.getNft(address);
-    const collection = await soon.getCollection(nft.collection);
-    console.log(collection);
-    let score = 0;
-    try {
-        const jsonPath = path.join(process.cwd(), 'rarities', nft.collection + '.json');
-        const jsonFile = fs.readFileSync(jsonPath, 'utf-8');
-        score = nft.properties ? rarity(nft.properties, JSON.parse(jsonFile)) : 0;
-    } catch (err) {
-        console.error(err);
-    }
-    return {props: {nft, score}};
+export async function getServerSideProps({params, query}: AddressContext) {
+    return {props: {address: params.address, collection: query.collection}};
 }
 
 export default Address;
