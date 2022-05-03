@@ -191,3 +191,8 @@ dist
 
 # local env files
 .env*.local
+
+Dockerfile
+.dockerignore
+README.md
+.git

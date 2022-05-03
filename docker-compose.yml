@@ -1,0 +1,29 @@
+version: '3.3'
+
+networks:
+  tanglerarity:
+
+services:
+  mongodb:
+    image: mongo:5.0.8
+    restart: always
+    container_name: mongodb
+    hostname: mongodb
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: tanglerarity
+      MONGO_INITDB_ROOT_PASSWORD: raritytangle
+    networks:
+      - tanglerarity
+
+  tanglerarity:
+    build: .
+    restart: always
+    container_name: tanglerarity
+    hostname: tanglerarity
+    ports:
+      # HTTP API
+      - "127.0.0.1:3000:3000/tcp"
+    environment:
+      - MONGODB_URI=mongodb://tanglerarity:raritytangle@mongodb:27017/?retryWrites=true&w=majority
+    networks:
+      - tanglerarity
