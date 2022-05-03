@@ -18,10 +18,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     let {total, nfts} = await getNfts(uid, limit, skip, {name: {$regex: new RegExp(filter, 'i')}});
-    if ((!nfts || nfts.length === 0) && (collection.total === collection.sold)) {
-        const newNfts = await soon.getNftsByCollections([uid]);
-        const enrichedNfts = enrichNftsWithRarityScores(newNfts);
-        nfts = await createNfts(uid, enrichedNfts);
+    if (collection.total === collection.sold) {
+        if ((!nfts || nfts.length === 0) && (collection.total === collection.sold)) {
+            const newNfts = await soon.getNftsByCollections([uid]);
+            const enrichedNfts = enrichNftsWithRarityScores(newNfts);
+            nfts = await createNfts(uid, enrichedNfts);
+        }
     }
 
     res.status(200).json({total, nfts});
