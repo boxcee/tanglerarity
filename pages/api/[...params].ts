@@ -30,7 +30,7 @@ const getOrCreateNfts = async (collectionId: string, limit: number, skip: number
     return {total: 0, items: []};
   }
   let data = await getNfts(collectionId, limit, skip, sort, order, filter);
-  if ((!data.items || data.items.length === 0)) {
+  if ((!data.items || data.items.length === 0) && Object.keys(filter).length === 0) {
     const newNfts = await soon.getNftsByCollections([collectionId]);
     const totalRarityScores = getTotalRarityScores(newNfts);
     await updateCollection(collectionId, {rarities: totalRarityScores});
@@ -44,8 +44,8 @@ const getOrCreateNfts = async (collectionId: string, limit: number, skip: number
 };
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const {query: {params, limit, skip, sort, order}, method, body: filter} = req;
-
+  const {query: {params, limit, skip, sort, order}, method, body} = req;
+  const filter = body ? JSON.parse(body) : {};
   const queryLimit: number = Array.isArray(limit) ? Number(limit[0]) : Number(limit);
   const queryOffset: number = Array.isArray(skip) ? Number(skip[0]) : Number(skip);
   const sortKey: string = Array.isArray(sort) ? sort[0] : sort;

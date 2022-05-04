@@ -6,11 +6,9 @@ import IconButton from '@mui/material/IconButton';
 import InfoIcon from '@mui/icons-material/Info';
 import ImageList from '@mui/material/ImageList';
 import {useRouter} from 'next/router';
-import useSWR from 'swr';
+import {useEffect, useState} from 'react';
 
-const fetcher = (url: RequestInfo): any => fetch(url).then((res: Response) => res.json());
-
-const searcher = (collectionId: string, params: SearchParams): string => {
+const getUrl = (collectionId: string, params: SearchParams): string => {
   const url: URL = new URL(`/api/collections/${collectionId}/nfts`, window.location.origin);
   Object.entries(params).forEach(([key, value]) => {
     url.searchParams.append(key, String(value));
@@ -30,23 +28,40 @@ type ImageLoaderProps = {
   rowsPerPage?: number,
   columns?: number,
   page?: number,
-  filter: {},
+  filter?: {},
   onNftsLoaded: (n: number) => void
 }
 
+const buildSearchBody = (filter: {}): BodyInit => {
+  return JSON.stringify({
+    $and: Object.entries(filter).map(([key, value]) => ({[`properties.${key.toLowerCase()}.value`]: value})),
+  });
+};
+
 const ImageLoader = ({collectionId, rowsPerPage, columns, page, filter, onNftsLoaded}: ImageLoaderProps) => {
   const router = useRouter();
-  const params = {
-    limit: ((rowsPerPage || 3) * (columns || 3)),
-    skip: ((page || 0) * (rowsPerPage || 3) * (columns || 3)),
-  };
-  const {data, error} = useSWR(() => searcher(collectionId, params), fetcher);
+  const [isLoading, setLoading] = useState(false);
+  const [data, setData] = useState({total: 0, items: []});
 
-  if (error) {
-    return <>{JSON.stringify(error, null, 2)}</>;
-  }
+  useEffect(() => {
+    const params = {
+      limit: ((rowsPerPage || 3) * (columns || 3)),
+      skip: ((page || 0) * (rowsPerPage || 3) * (columns || 3)),
+    };
+    const options = {
+      method: filter && Object.keys(filter).length > 0 ? 'POST' : 'GET',
+      body: filter && Object.keys(filter).length > 0 ? buildSearchBody(filter) : null,
+    };
+    setLoading(true);
+    fetch(getUrl(collectionId, params), options)
+      .then(res => res.json())
+      .then(data => {
+        setLoading(false);
+        setData(data);
+      });
+  }, [collectionId, rowsPerPage, columns, page, filter]);
 
-  if (!data) {
+  if (isLoading) {
     return <div>Is loading...</div>;
   }
 
@@ -54,7 +69,7 @@ const ImageLoader = ({collectionId, rowsPerPage, columns, page, filter, onNftsLo
     router.push('/collections/' + collectionId + '/nfts/' + uid);
   };
 
-  const {total, items: nfts} = data;
+  const {total, items: nfts} = data as ({ total: number, items: RankedNft[] });
 
   onNftsLoaded(total);
 

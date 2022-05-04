@@ -1,10 +1,9 @@
-import {Nft} from "soonaverse/dist/interfaces/models/nft";
+import {Collection} from 'soonaverse/dist/interfaces/models/collection';
 
-export type EnrichedNft = Nft & {
-    score: number,
-    rarity: {
-        [key: string]: {
-            [key: string]: number
-        }
+export type EnrichedCollection = Collection & {
+  rarities: {
+    [key: string]: {
+      [key: string]: number
     }
+  }
 }
