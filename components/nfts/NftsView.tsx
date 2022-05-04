@@ -38,7 +38,7 @@ const NftsView: FunctionComponent<NftsViewProps> = ({collectionId}) => {
   return (
     <>
       <FormGroup row={true}>
-        {Object.keys(rarities).map((key: string) => cloneElement(
+        {Object.keys((rarities || {})).map((key: string) => cloneElement(
           <FormControl fullWidth={true}>
             <InputLabel htmlFor={`${key}-input`}>{key}</InputLabel>
             <Select
