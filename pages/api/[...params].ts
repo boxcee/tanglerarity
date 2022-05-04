@@ -7,8 +7,9 @@ import {
   getCollections,
   getNft,
   getNfts,
+  updateCollection,
 } from '../../lib/mongodb/collections';
-import {enrichNftsWithRarityScores} from '../../lib/utils/rarity';
+import {enrichNftsWithRarityScores, getTotalRarityScores} from '../../lib/utils/rarity';
 import web3 from 'web3';
 
 const soon = new Soon();
@@ -31,7 +32,9 @@ const getOrCreateNfts = async (collectionId: string, limit: number, skip: number
   let data = await getNfts(collectionId, limit, skip, sort, order, filter);
   if ((!data.items || data.items.length === 0)) {
     const newNfts = await soon.getNftsByCollections([collectionId]);
-    const enrichedNfts = enrichNftsWithRarityScores(newNfts);
+    const totalRarityScores = getTotalRarityScores(newNfts);
+    await updateCollection(collectionId, {rarities: totalRarityScores});
+    const enrichedNfts = enrichNftsWithRarityScores(totalRarityScores, newNfts);
     data = {
       total: enrichedNfts.length,
       items: await createNfts(collectionId, enrichedNfts),

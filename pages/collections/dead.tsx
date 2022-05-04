@@ -2,7 +2,7 @@ import {NextPage} from 'next';
 import {ChangeEvent, MouseEvent, useState} from 'react';
 import TablePagination from '@mui/material/TablePagination';
 import TextField from '@mui/material/TextField';
-import ImageLoader from '../../components/collections/ImageLoader';
+import ImageLoader from '../../components/nfts/ImageLoader';
 
 type AddressProps = {
   address: string,
@@ -47,7 +47,7 @@ const Dead: NextPage<AddressProps> = ({address, limit, skip}) => {
     <div>
       <TextField id="standard-basic" label="Name" variant="standard" onChange={handleChangeFilter}
                  value={filter} />
-      <ImageLoader address={address} rowsPerPage={rowsPerPage} columns={columns} page={page} filter={filter}
+      <ImageLoader collectionId={address} rowsPerPage={rowsPerPage} columns={columns} page={page} filter={filter}
                    onNftsLoaded={handleNftsLoaded} />
       <TablePagination
         component="div"
