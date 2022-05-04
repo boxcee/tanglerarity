@@ -22,6 +22,8 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
+    needs:
+    - publish
     steps:
       - name: Deploy New Container
         uses: appleboy/ssh-action@master
