@@ -3,7 +3,7 @@ import Head from 'next/head';
 import Image from 'next/image';
 import styles from '../styles/Home.module.css';
 import Link from 'next/link';
-import {ChangeEvent, Fragment, useEffect, useState} from 'react';
+import {Fragment, SyntheticEvent, useEffect, useState} from 'react';
 import {useRouter} from 'next/router';
 import Autocomplete from '@mui/material/Autocomplete';
 import Stack from '@mui/material/Stack';
@@ -12,13 +12,19 @@ import TextField from '@mui/material/TextField';
 import {Collection} from 'soonaverse/dist/interfaces/models';
 import {RankedNft} from '../types/RankedNft';
 import CircularProgress from '@mui/material/CircularProgress';
+import {Nft} from 'soonaverse/dist/interfaces/models/nft';
+
+type Option = (Collection | RankedNft) & {
+  groupBy: string
+}
 
 const Home: NextPage = () => {
   const router = useRouter();
   const [open, setOpen] = useState(false);
-  const [options, setOptions] = useState([] as ((Collection | RankedNft) & { groupBy: string })[]);
+  const [options, setOptions] = useState([] as Option[]);
   const [value, setValue] = useState('');
   const [isLoading, setLoading] = useState(false);
+  const [option, setOption] = useState(null as (Option | null));
 
   useEffect(() => {
     if (value.length > 2) {
@@ -34,8 +40,27 @@ const Home: NextPage = () => {
     }
   }, [value]);
 
-  const handleOnChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setValue(event.target.value);
+  const handleOnInputChange = (event: SyntheticEvent, value: string) => {
+    setValue(value);
+  };
+
+  const handleOnChange = (event: SyntheticEvent, value: string | Option) => {
+    setOption(value as Option);
+  };
+
+  const handleOnClick = () => {
+    if (value.length !== 0 && option) {
+      switch (option.groupBy) {
+        case 'collections':
+          router.push(`/collections/${option.uid}`);
+          break;
+        case 'nfts':
+          router.push(`/collections/${(option as Nft).collection}/nfts/${option.uid}`);
+          break;
+        default:
+        // Nothing
+      }
+    }
   };
 
   return (
@@ -65,15 +90,16 @@ const Home: NextPage = () => {
               onOpen={() => setOpen(true)}
               onClose={() => setOpen(false)}
               options={options}
-              getOptionLabel={option => (option as (Collection | RankedNft)).name}
+              getOptionLabel={option => (option as Option).name}
               groupBy={(option) => option.groupBy.toUpperCase()}
               loading={isLoading}
+              onInputChange={handleOnInputChange}
+              onChange={handleOnChange}
               filterOptions={(x) => x}
               renderInput={(params) => (
                 <TextField
                   {...params}
                   label="Address, name, description, etc."
-                  onChange={handleOnChange}
                   InputProps={{
                     ...params.InputProps,
                     type: 'search',
@@ -87,7 +113,7 @@ const Home: NextPage = () => {
                 />
               )}
             />
-            <Button variant="contained">Search</Button>
+            <Button variant="contained" onClick={handleOnClick}>Search</Button>
           </Stack>
         </div>
       </main>
