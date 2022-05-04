@@ -1,7 +1,10 @@
-import {FunctionComponent, useEffect, useState} from 'react';
+import {FunctionComponent} from 'react';
 import {useRouter} from 'next/router';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import IconButton from '@mui/material/IconButton';
+import useSWR from 'swr';
+
+const fetcher = (url: RequestInfo): any => fetch(url).then((res: Response) => res.json());
 
 type CollectionDetailsViewProps = {
   collectionId: string
@@ -9,20 +12,13 @@ type CollectionDetailsViewProps = {
 
 const CollectionsDetailView: FunctionComponent<CollectionDetailsViewProps> = ({collectionId}) => {
   const router = useRouter();
-  const [isLoading, setLoading] = useState(false);
-  const [collection, setCollection] = useState({});
+  const {data, error} = useSWR(`/api/collections/${collectionId}`, fetcher);
 
-  useEffect(() => {
-    setLoading(true);
-    fetch('/api/collections/' + collectionId)
-      .then(res => res.json())
-      .then(data => {
-        setLoading(false);
-        setCollection(data);
-      });
-  }, [collectionId]);
+  if (error) {
+    return <>{JSON.stringify(error, null, 2)}</>;
+  }
 
-  if (isLoading) {
+  if (!data) {
     return <>Is loading...</>;
   }
 
@@ -37,7 +33,7 @@ const CollectionsDetailView: FunctionComponent<CollectionDetailsViewProps> = ({c
           <VisibilityIcon />
         </IconButton>
       </p>
-      {JSON.stringify(collection, null, 2)}
+      {JSON.stringify(data, null, 2)}
     </>
   );
 };

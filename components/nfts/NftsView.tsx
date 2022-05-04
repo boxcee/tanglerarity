@@ -1,4 +1,4 @@
-import {cloneElement, FunctionComponent, useEffect, useState} from 'react';
+import {cloneElement, FunctionComponent} from 'react';
 import {useRouter} from 'next/router';
 import {RankedNft} from '../../types/RankedNft';
 import ListItem from '@mui/material/ListItem';
@@ -6,6 +6,9 @@ import IconButton from '@mui/material/IconButton';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import ListItemText from '@mui/material/ListItemText';
 import List from '@mui/material/List';
+import useSWR from 'swr';
+
+const fetcher = (url: RequestInfo): any => fetch(url).then((res: Response) => res.json());
 
 type NftsViewProps = {
   collectionId: string
@@ -13,20 +16,13 @@ type NftsViewProps = {
 
 const NftsView: FunctionComponent<NftsViewProps> = ({collectionId}) => {
   const router = useRouter();
-  const [isLoading, setLoading] = useState(false);
-  const [nftData, setNftData] = useState({total: 0, items: []} as { total: number, items: RankedNft[] });
+  const {data, error} = useSWR(`/api/collections/${collectionId}/nfts?limit=15`, fetcher);
 
-  useEffect(() => {
-    setLoading(true);
-    fetch('/api/collections/' + collectionId + '/nfts?limit=15')
-      .then(res => res.json())
-      .then(data => {
-        setLoading(false);
-        setNftData(data);
-      });
-  }, [collectionId]);
+  if (error) {
+    return <>{JSON.stringify(error, null, 2)}</>;
+  }
 
-  if (isLoading) {
+  if (!data) {
     return <>Is loading...</>;
   }
 
@@ -34,12 +30,12 @@ const NftsView: FunctionComponent<NftsViewProps> = ({collectionId}) => {
     router.push('/collections/' + collectionId + '/nfts/' + nftId);
   };
 
-  const {total, items: nfts} = nftData;
+  const {total, items: nfts} = data;
 
   return (
     <>
       <List>
-        {nfts.map(nft => cloneElement(
+        {nfts.map((nft: RankedNft) => cloneElement(
           <ListItem
             secondaryAction={
               <IconButton edge="end" aria-label="view" onClick={() => handleViewClick(nft.uid)}>

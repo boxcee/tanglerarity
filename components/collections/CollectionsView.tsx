@@ -1,28 +1,24 @@
-import {cloneElement, useEffect, useState} from 'react';
+import {cloneElement} from 'react';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import IconButton from '@mui/material/IconButton';
 import ListItemText from '@mui/material/ListItemText';
 import VisibilityIcon from '@mui/icons-material/Visibility';
-import {Collection} from 'soonaverse/dist/interfaces/models';
 import {useRouter} from 'next/router';
+import useSWR from 'swr';
+import {Collection} from 'soonaverse/dist/interfaces/models';
+
+const fetcher = (url: RequestInfo): any => fetch(url).then((res: Response) => res.json());
 
 const CollectionsView = () => {
   const router = useRouter();
-  const [isLoading, setLoading] = useState(false);
-  const [collections, setCollections] = useState([] as Collection[]);
+  const {data, error} = useSWR('/api/collections', fetcher);
 
-  useEffect(() => {
-    setLoading(true);
-    fetch('/api/collections')
-      .then(res => res.json())
-      .then(data => {
-        setLoading(false);
-        setCollections(data);
-      });
-  }, []);
+  if (error) {
+    return <>{JSON.stringify(error, null, 2)}</>;
+  }
 
-  if (isLoading) {
+  if (!data) {
     return <>Is loading...</>;
   }
 
@@ -33,7 +29,7 @@ const CollectionsView = () => {
   return (
     <>
       <List>
-        {collections.map(collection => cloneElement(
+        {data.map((collection: Collection) => cloneElement(
           <ListItem
             secondaryAction={
               <IconButton edge="end" aria-label="view" onClick={() => handleViewClick(collection.uid)}>

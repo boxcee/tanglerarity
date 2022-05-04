@@ -1,5 +1,7 @@
-import {FunctionComponent, useEffect, useState} from 'react';
-import {RankedNft} from '../../types/RankedNft';
+import {FunctionComponent} from 'react';
+import useSWR from 'swr';
+
+const fetcher = (url: RequestInfo): any => fetch(url).then((res: Response) => res.json());
 
 type NftsDetailViewProps = {
   collectionId: string
@@ -7,25 +9,18 @@ type NftsDetailViewProps = {
 }
 
 const NftsDetailView: FunctionComponent<NftsDetailViewProps> = ({collectionId, nftId}) => {
-  const [isLoading, setLoading] = useState(false);
-  const [nft, setNft] = useState({} as RankedNft);
+  const {data, error} = useSWR(`/api/collections/${collectionId}/nfts/${nftId}`, fetcher);
 
-  useEffect(() => {
-    setLoading(true);
-    fetch('/api/collections/' + collectionId + '/nfts/' + nftId)
-      .then(res => res.json())
-      .then(data => {
-        setLoading(false);
-        setNft(data);
-      });
-  }, [collectionId, nftId]);
+  if (error) {
+    return <>{JSON.stringify(error, null, 2)}</>;
+  }
 
-  if (isLoading) {
+  if (!data) {
     return <>Is loading...</>;
   }
 
   return (
-    <>{JSON.stringify(nft, null, 2)}</>
+    <>{JSON.stringify(data, null, 2)}</>
   );
 };
 
