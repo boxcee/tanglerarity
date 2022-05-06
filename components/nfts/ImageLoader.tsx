@@ -65,7 +65,7 @@ const ImageLoader = ({collectionId, rowsPerPage, columns, page, filter, total}: 
   }
 
   const handleInfoClick = (nft: RankedNft) => {
-    router.push('/collections/' + collectionId + '/nfts/' + nft.uid);
+    router.push('https://soonaverse.com/nft/' + nft.uid);
   };
 
   const {items: nfts} = data as ({ items: RankedNft[] });
@@ -95,7 +95,11 @@ const ImageLoader = ({collectionId, rowsPerPage, columns, page, filter, total}: 
                 aria-label={`info about ${nft.name}`}
                 onClick={() => handleInfoClick(nft)}
               >
-                <Image src="/soonaverse.ico" style={{width: 32, height: 32, padding: 20}} alt="soonaverse favicon" />
+                <Image
+                  layout="fill"
+                  src="/soonaverse.ico"
+                  alt="soonaverse favicon"
+                />
               </IconButton>
             }
           />
