@@ -26,10 +26,12 @@ const CollectionsView = () => {
     router.push('/collections/' + collectionId);
   };
 
+  const {total, items} = data;
+
   return (
     <>
       <List>
-        {data.map((collection: Collection) => cloneElement(
+        {items.map((collection: Collection) => cloneElement(
           <ListItem
             secondaryAction={
               <IconButton edge="end" aria-label="view" onClick={() => handleViewClick(collection.uid)}>

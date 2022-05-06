@@ -1,5 +1,5 @@
-import {EnrichedNft} from "./EnrichedNft";
+import {EnrichedNft} from './EnrichedNft';
 
 export type RankedNft = EnrichedNft & {
-    rank: string
+  rank: number
 }

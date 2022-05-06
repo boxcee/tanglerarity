@@ -4,6 +4,8 @@ import CollectionsDetailView from '../components/collections/CollectionsDetailVi
 import web3 from 'web3';
 import NftsView from '../components/nfts/NftsView';
 import NftsDetailView from '../components/nfts/NftsDetailView';
+import Layout from '../components/layout';
+import {useFetchUser} from '../lib/user';
 
 type ParamsProps = {
   paths: string[]
@@ -16,27 +18,27 @@ type ParamsContext = {
 }
 
 const Params: NextPage<ParamsProps> = ({paths}) => {
+  const {user, loading} = useFetchUser();
+
+  let pageToRender;
+
   if (paths.length === 1 && paths[0] === 'collections') {
-    return (
-      <CollectionsView />
-    );
+    pageToRender = (<CollectionsView />);
   } else if (paths.length === 2 && paths[0] === 'collections' && web3.utils.isAddress(paths[1])) {
-    return (
-      <CollectionsDetailView collectionId={paths[1]} />
-    );
+    pageToRender = (<CollectionsDetailView collectionId={paths[1]} />);
   } else if (paths.length === 3 && paths[0] === 'collections' && web3.utils.isAddress(paths[1]) && paths[2] === 'nfts') {
-    return (
-      <NftsView collectionId={paths[1]} />
-    );
+    pageToRender = (<NftsView collectionId={paths[1]} />);
   } else if (paths.length === 4 && paths[0] === 'collections' && web3.utils.isAddress(paths[1]) && paths[2] === 'nfts' && web3.utils.isAddress(paths[3])) {
-    return (
-      <NftsDetailView collectionId={paths[1]} nftId={paths[3]} />
-    );
+    pageToRender = (<NftsDetailView collectionId={paths[1]} nftId={paths[3]} />);
   } else {
-    return (
-      <>DEAD ROUTE</>
-    );
+    pageToRender = (<>DEAD ROUTE</>);
   }
+
+  return (
+    <Layout user={user} loading={loading}>
+      {pageToRender}
+    </Layout>
+  );
 };
 
 export async function getServerSideProps({params}: ParamsContext) {

@@ -3,10 +3,9 @@ import ImageListItem from '@mui/material/ImageListItem';
 import Image from 'next/image';
 import ImageListItemBar from '@mui/material/ImageListItemBar';
 import IconButton from '@mui/material/IconButton';
-import InfoIcon from '@mui/icons-material/Info';
 import ImageList from '@mui/material/ImageList';
 import {useRouter} from 'next/router';
-import {useEffect, useState} from 'react';
+import {ReactNode, useEffect, useState} from 'react';
 
 const getUrl = (collectionId: string, params: SearchParams): string => {
   const url: URL = new URL(`/api/collections/${collectionId}/nfts`, window.location.origin);
@@ -29,7 +28,7 @@ type ImageLoaderProps = {
   columns?: number,
   page?: number,
   filter?: {},
-  onNftsLoaded: (n: number) => void
+  total: number
 }
 
 const buildSearchBody = (filter: {}): BodyInit => {
@@ -38,7 +37,7 @@ const buildSearchBody = (filter: {}): BodyInit => {
   });
 };
 
-const ImageLoader = ({collectionId, rowsPerPage, columns, page, filter, onNftsLoaded}: ImageLoaderProps) => {
+const ImageLoader = ({collectionId, rowsPerPage, columns, page, filter, total}: ImageLoaderProps) => {
   const router = useRouter();
   const [isLoading, setLoading] = useState(false);
   const [data, setData] = useState({total: 0, items: []});
@@ -65,13 +64,17 @@ const ImageLoader = ({collectionId, rowsPerPage, columns, page, filter, onNftsLo
     return <div>Is loading...</div>;
   }
 
-  const handleInfoClick = (uid: string) => {
-    router.push('/collections/' + collectionId + '/nfts/' + uid);
+  const handleInfoClick = (nft: RankedNft) => {
+    router.push('/collections/' + collectionId + '/nfts/' + nft.uid);
   };
 
-  const {total, items: nfts} = data as ({ total: number, items: RankedNft[] });
+  const {items: nfts} = data as ({ items: RankedNft[] });
 
-  onNftsLoaded(total);
+  const getSubtitle = (nft: RankedNft): ReactNode => {
+    if (nft.rank && nft.score) {
+      return `Rank: ${nft.rank}/${total}; Score: ${nft.score.toFixed(2)}`;
+    }
+  };
 
   return (
     <ImageList sx={{width: 750, height: 750}} cols={columns} rowHeight={250}>
@@ -85,14 +88,14 @@ const ImageLoader = ({collectionId, rowsPerPage, columns, page, filter, onNftsLo
           />
           <ImageListItemBar
             title={nft.name}
-            subtitle={`Rank: ${nft.rank}; Score: ${nft.score.toFixed(2)}`}
+            subtitle={getSubtitle(nft)}
             actionIcon={
               <IconButton
                 sx={{color: 'rgba(255, 255, 255, 0.54)'}}
                 aria-label={`info about ${nft.name}`}
-                onClick={() => handleInfoClick(nft.uid)}
+                onClick={() => handleInfoClick(nft)}
               >
-                <InfoIcon />
+                <Image src="/soonaverse.ico" style={{width: 32, height: 32, padding: 20}} alt="soonaverse favicon" />
               </IconButton>
             }
           />

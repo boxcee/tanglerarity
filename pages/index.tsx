@@ -1,5 +1,4 @@
 import type {NextPage} from 'next';
-import Head from 'next/head';
 import Image from 'next/image';
 import styles from '../styles/Home.module.css';
 import Link from 'next/link';
@@ -13,6 +12,8 @@ import {Collection} from 'soonaverse/dist/interfaces/models';
 import {RankedNft} from '../types/RankedNft';
 import CircularProgress from '@mui/material/CircularProgress';
 import {Nft} from 'soonaverse/dist/interfaces/models/nft';
+import Layout from '../components/layout';
+import {useFetchUser} from '../lib/user';
 
 type Option = (Collection | RankedNft) & {
   groupBy: string
@@ -25,6 +26,7 @@ const Home: NextPage = () => {
   const [value, setValue] = useState('');
   const [isLoading, setLoading] = useState(false);
   const [option, setOption] = useState(null as (Option | null));
+  const {user, loading} = useFetchUser();
 
   useEffect(() => {
     if (value.length > 2) {
@@ -68,16 +70,7 @@ const Home: NextPage = () => {
   };
 
   return (
-    <div className={styles.container}>
-      <Head>
-        <title>TangleRarity</title>
-        <meta name="description" content="Explore your NFTs rarity." />
-        <link rel="icon" href="/favicon.ico" />
-        <link
-          rel="stylesheet"
-          href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
-        />
-      </Head>
+    <Layout user={user} loading={loading}>
 
       <main className={styles.main}>
         <h1 className={styles.title}>
@@ -134,7 +127,7 @@ const Home: NextPage = () => {
                     </span>
         </a>
       </footer>
-    </div>
+    </Layout>
   );
 };
 
