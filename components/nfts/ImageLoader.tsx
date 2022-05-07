@@ -96,7 +96,8 @@ const ImageLoader = ({collectionId, rowsPerPage, columns, page, filter, total}: 
                 onClick={() => handleInfoClick(nft)}
               >
                 <Image
-                  layout="fill"
+                  height={16}
+                  width={16}
                   src="/soonaverse.ico"
                   alt="soonaverse favicon"
                 />

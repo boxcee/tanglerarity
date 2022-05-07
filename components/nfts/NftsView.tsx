@@ -33,12 +33,12 @@ const NftsView: FunctionComponent<NftsViewProps> = ({collectionId}) => {
     });
   };
 
-  const {totalRarities, total} = data as EnrichedCollection;
+  const {rarities, total} = data as EnrichedCollection;
 
   return (
     <>
       <FormGroup row={true}>
-        {Object.keys((totalRarities || {})).map((key: string) => cloneElement(
+        {Object.keys((rarities || {})).map((key: string) => cloneElement(
           <FormControl fullWidth={true}>
             <InputLabel htmlFor={`${key}-input`}>{key}</InputLabel>
             <Select
@@ -48,7 +48,7 @@ const NftsView: FunctionComponent<NftsViewProps> = ({collectionId}) => {
               label={key}
               onChange={(event) => handleOnChange(key, event)}
             >
-              {Object.keys(totalRarities[key]).map((trait: string) => cloneElement(
+              {Object.keys(rarities[key]).map((trait: string) => cloneElement(
                 (<MenuItem value={trait}>{trait}</MenuItem>)
                 , {key: trait}))}
             </Select>

@@ -1,7 +1,11 @@
 import {WithId} from 'mongodb';
 import {Collection} from 'soonaverse/dist/interfaces/models/collection';
 
-type CollectionDocument = WithId<Collection>;
+type CollectionWithRarity = Collection & {
+  rarities: {}
+};
+
+type CollectionDocument = WithId<CollectionWithRarity>;
 
 type CollectionDocuments = {
   total: number,

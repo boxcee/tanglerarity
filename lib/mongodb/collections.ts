@@ -1,4 +1,4 @@
-import {Document, ObjectId, Sort} from 'mongodb';
+import {Document, Filter, ObjectId, Sort} from 'mongodb';
 import {CollectionDocument, CollectionDocuments} from './types/Collection';
 import config from './config';
 import * as utils from './utils';
@@ -21,22 +21,23 @@ const getCollections = async (limit?: number, skip?: number, sort?: string, orde
   return {total: await mongo.countDocuments(), items: collections};
 };
 
-const getCollection = async (uid: string, filter = {}): Promise<CollectionDocument> => {
+const getCollection = async (uid: string, filter = {}, projection = {}): Promise<CollectionDocument> => {
   const mongo = await collectionHelper;
-  const collection = await mongo.findOne({uid, ...filter});
+  const collection = await mongo.findOne({uid, ...filter}, {projection});
   return collection as CollectionDocument;
 };
 
-const createCollection = async (document: Document): Promise<CollectionDocument> => {
+const createCollection = async (document: Document, projection = {}): Promise<CollectionDocument> => {
+  //TODO: Filter projection fields
   const mongo = await collectionHelper;
   const createdDocument = {_id: document.uid, ...document} as CollectionDocument;
   await mongo.insertOne(createdDocument);
   return createdDocument as CollectionDocument;
 };
 
-const updateCollection = async (uid: string, update: Document): Promise<void> => {
+const updateCollection = async (collection: CollectionDocument, update: Document): Promise<void> => {
   const mongo = await collectionHelper;
-  await mongo.updateOne({_id: new ObjectId(uid)}, {$set: update});
+  await mongo.updateOne(collection as Filter<CollectionDocument>, {$set: update});
 };
 
 export {createCollection, getCollections, updateCollection, getCollection};

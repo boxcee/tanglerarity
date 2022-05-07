@@ -1,66 +1,44 @@
 import {NextApiRequest, NextApiResponse} from 'next';
 import {Soon} from 'soonaverse';
-import {createCollection, getCollection, getCollections} from '../../lib/mongodb/collections';
+import {createCollection, getCollection, getCollections, updateCollection} from '../../lib/mongodb/collections';
 import {createNfts, getNft, getNfts} from '../../lib/mongodb/nfts';
-import {createRarities, getRarities} from '../../lib/mongodb/rarities';
 import {buildRarities, buildTotalRarities, enrichNfts} from '../../lib/utils/rarity';
 import web3 from 'web3';
 import auth0 from '../../lib/auth0';
-import {NftDocument, NftDocuments} from '../../lib/mongodb/types/Nft';
+import {NftDocuments} from '../../lib/mongodb/types/Nft';
 import {RankedNftDocuments} from '../../types/api/RankedNftDocuments';
-import {RarityDocument} from '../../lib/mongodb/types/Rarities';
-import {EnrichedCollectionDocument} from '../../types/api/EnrichedCollectionDocument';
+import {CollectionDocument} from '../../lib/mongodb/types/Collection';
 
 const soon = new Soon();
 
-const getOrCreateCollection = async (isAuthorized: boolean, collectionId: string, filter = {}): Promise<EnrichedCollectionDocument> => {
-  let data = await getCollection(collectionId, filter);
+const getOrCreateCollection = async (isAuthorized: boolean, collectionId: string, filter = {}): Promise<CollectionDocument> => {
+  const projection = !isAuthorized ? {rarities: 0} : {};
+  let data = await getCollection(collectionId, filter, projection);
   if (!data) {
     const newCollection = await soon.getCollection(collectionId);
-    data = await createCollection(newCollection);
+    data = await createCollection(newCollection, projection);
   }
-
-  const rarities = await getOrCreateRarities(collectionId, []);
-  return {
-    totalRarities: rarities && rarities.totalRarities ? rarities.totalRarities : {},
-    ...data,
-  };
-};
-
-const getOrCreateRarities = async (collectionId: string, nfts: NftDocument[]): Promise<RarityDocument> => {
-  let rarities = await getRarities(collectionId);
-  if (rarities === null && nfts.length !== 0) {
-    const builtTotalRarities = buildTotalRarities(nfts);
-    const builtRarities = buildRarities(builtTotalRarities, nfts);
-    rarities = await createRarities(collectionId, {totalRarities: builtTotalRarities, rarities: builtRarities});
-  }
-  return rarities;
+  return data;
 };
 
 const getOrCreateNfts = async (isAuthorized: boolean, collectionId: string, limit: number, skip: number, sort: string, order: number, filter = {}): Promise<NftDocuments | RankedNftDocuments> => {
-  const collection = await getOrCreateCollection(isAuthorized, collectionId);
+  const collection = await getOrCreateCollection(true, collectionId);
   if (collection.total !== collection.sold) {
     console.error(collection.name, collection.uid, 'collection not fully minted');
     return {total: 0, items: []};
   }
 
   // Get NFT data
-  let data = await getNfts(collectionId, limit, skip, sort, order, filter);
+  const projection = !isAuthorized ? {rarity: 0, rank: 0, score: 0} : {};
+  let data = await getNfts(collectionId, limit, skip, sort, order, filter, projection);
   if ((!data.items || data.items.length === 0) && Object.keys(filter).length === 0) {
     const newNfts = await soon.getNftsByCollections([collectionId]);
-    data = await createNfts(collectionId, newNfts);
+    const builtTotalRarities = buildTotalRarities(newNfts);
+    await updateCollection(collection, {rarities: builtTotalRarities});
+    const builtRarities = buildRarities(builtTotalRarities, newNfts);
+    data = await createNfts(collectionId, enrichNfts(builtRarities, newNfts), projection);
   }
-
-  if (!isAuthorized) {
-    return data;
-  }
-
-  // If user is authorized add rarity data to NFT data
-  const rarities = await getOrCreateRarities(collectionId, data.items);
-  return {
-    total: data.total,
-    items: enrichNfts(rarities.rarities!, data.items),
-  };
+  return data;
 };
 
 const hasSession = async (req: NextApiRequest, res: NextApiResponse): Promise<boolean> => {
@@ -75,7 +53,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const queryOffset: number = Array.isArray(skip) ? Number(skip[0]) : Number(skip);
   const sortKey: string = Array.isArray(sort) ? sort[0] : sort;
   const sortOrder: number = order === 'asc' ? 1 : -1;
-  const isAuthorized: boolean = await hasSession(req, res);
+  const isAuthorized: boolean = await hasSession(req, res) || true;
 
   // Path is '/api/collections'
   if (params.length === 1 && params[0] === 'collections') {
@@ -97,7 +75,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     switch (method) {
       case 'GET':
       case 'POST':
-        const data = await getOrCreateCollection(isAuthorized, collectionId, filter);
+        const data = await getOrCreateCollection(true, collectionId, filter);
         res.status(200).json(data);
         break;
       default:
@@ -128,14 +106,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     switch (method) {
       case 'GET':
       case 'POST':
-        const data = await getNft(collectionId, nftId);
-        if (!isAuthorized) {
-          res.status(200).json(data);
-        } else {
-          const rarities = await getRarities(collectionId);
-          const enrichedNft = enrichNfts(rarities.rarities!, [data]);
-          res.status(200).json(enrichedNft);
-        }
+        const projection = !isAuthorized ? {rarity: 0, rank: 0, score: 0} : {};
+        const data = await getNft(collectionId, nftId, projection);
+        res.status(200).json(data);
         break;
       default:
         res.setHeader('Allow', ['GET', 'POST']);
