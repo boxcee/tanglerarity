@@ -12,7 +12,7 @@ import {getOrCreateCollection} from '../../lib/mongodb/utils';
 const soon = new Soon();
 
 const getOrCreateNfts = async (isAuthorized: boolean, collectionId: string, limit: number, skip: number, sort: string, order: number, filter = {}): Promise<NftDocuments | RankedNftDocuments> => {
-  const collection = await getOrCreateCollection(true, collectionId);
+  const collection = await getOrCreateCollection(isAuthorized, collectionId);
   if (!collection) {
     return {total: 0, items: []};
   } else if (!collection.rarities && collection.total !== collection.sold) {
@@ -68,7 +68,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     switch (method) {
       case 'GET':
       case 'POST':
-        const data = await getOrCreateCollection(true, collectionId, filter);
+        const data = await getOrCreateCollection(isAuthorized, collectionId, filter);
         res.status(200).json(data);
         break;
       default:
