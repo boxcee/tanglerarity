@@ -38,4 +38,6 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           script: |
             cd /tanglerarity
-            docker-compose -p tanglerarity up -d --build --force-recreate tanglerarity
+            docker-compose down tanglerarity
+            docker-compose pull
+            docker-compose -p tanglerarity up -d tanglerarity

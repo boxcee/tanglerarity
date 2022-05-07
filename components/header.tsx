@@ -35,12 +35,12 @@ const Header: FunctionComponent<HeaderProps> = ({user, loading}) => {
                   </Link>
                 </li>
                 <li>
-                  <Link href="/api/logout">Logout</Link>
+                  <Link href={`/api/auth/logout?returnTo=${encodeURIComponent(window.location.pathname)}`}>Logout</Link>
                 </li>
               </>
             ) : (
               <li>
-                <Link href="/api/login">Login</Link>
+                <Link href={`/api/auth/login?returnTo=${encodeURIComponent(window.location.pathname)}`}>Login</Link>
               </li>
             ))}
         </ul>
