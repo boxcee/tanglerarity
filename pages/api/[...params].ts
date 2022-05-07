@@ -23,11 +23,17 @@ const getOrCreateNfts = async (isAuthorized: boolean, collectionId: string, limi
   // Get NFT data
   const projection = !isAuthorized ? {rarity: 0, rank: 0, score: 0} : {};
   let data = await getNfts(collectionId, limit, skip, sort, order, filter, projection);
-  if ((!data.items || data.items.length === 0) && Object.keys(filter).length === 0) {
+  const nftsHaveNotBeenLoadedYet = !data.items || data.items.length === 0;
+  const nftsHaveOnlyBeenLoadedPartly = data.items.length !== collection.sold;
+  if ((nftsHaveNotBeenLoadedYet || nftsHaveOnlyBeenLoadedPartly) && Object.keys(filter).length === 0) {
     const newNfts = await soon.getNftsByCollections([collectionId]);
-    const filteredNfts = newNfts.filter(nft => !nft.placeholderNft);
+    const filteredNfts = newNfts
+      .filter(nft => !nft.placeholderNft)
+      .filter(nft => !data.items.map(nft => nft.name).includes(nft.name));
     const builtTotalRarities = !collection.rarities ? buildTotalRarities(filteredNfts) : collection.rarities;
-    await updateCollection(collection, {rarities: builtTotalRarities});
+    if (nftsHaveNotBeenLoadedYet && !nftsHaveOnlyBeenLoadedPartly) {
+      await updateCollection(collection, {rarities: builtTotalRarities});
+    }
     const builtRarities = !collection.rarityMap ? buildRarities(builtTotalRarities, filteredNfts) : collection.rarityMap;
     data = await createNfts(collectionId, enrichNfts(builtRarities, filteredNfts), projection);
   }
