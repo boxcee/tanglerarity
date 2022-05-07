@@ -1,29 +1,21 @@
 import {NextApiRequest, NextApiResponse} from 'next';
 import {Soon} from 'soonaverse';
-import {createCollection, getCollection, getCollections, updateCollection} from '../../lib/mongodb/collections';
+import {getCollections, updateCollection} from '../../lib/mongodb/collections';
 import {createNfts, getNft, getNfts} from '../../lib/mongodb/nfts';
 import {buildRarities, buildTotalRarities, enrichNfts} from '../../lib/utils/rarity';
 import web3 from 'web3';
 import auth0 from '../../lib/auth0';
 import {NftDocuments} from '../../lib/mongodb/types/Nft';
 import {RankedNftDocuments} from '../../types/api/RankedNftDocuments';
-import {CollectionDocument} from '../../lib/mongodb/types/Collection';
+import {getOrCreateCollection} from '../../lib/mongodb/utils';
 
 const soon = new Soon();
 
-const getOrCreateCollection = async (isAuthorized: boolean, collectionId: string, filter = {}): Promise<CollectionDocument> => {
-  const projection = !isAuthorized ? {rarities: 0} : {};
-  let data = await getCollection(collectionId, filter, projection);
-  if (!data) {
-    const newCollection = await soon.getCollection(collectionId);
-    data = await createCollection(newCollection, projection);
-  }
-  return data;
-};
-
 const getOrCreateNfts = async (isAuthorized: boolean, collectionId: string, limit: number, skip: number, sort: string, order: number, filter = {}): Promise<NftDocuments | RankedNftDocuments> => {
   const collection = await getOrCreateCollection(true, collectionId);
-  if (collection.total !== collection.sold) {
+  if (!collection) {
+    return {total: 0, items: []};
+  } else if (!collection.rarities && collection.total !== collection.sold) {
     console.error(collection.name, collection.uid, 'collection not fully minted');
     return {total: 0, items: []};
   }
@@ -33,10 +25,11 @@ const getOrCreateNfts = async (isAuthorized: boolean, collectionId: string, limi
   let data = await getNfts(collectionId, limit, skip, sort, order, filter, projection);
   if ((!data.items || data.items.length === 0) && Object.keys(filter).length === 0) {
     const newNfts = await soon.getNftsByCollections([collectionId]);
-    const builtTotalRarities = buildTotalRarities(newNfts);
+    const filteredNfts = newNfts.filter(nft => !nft.placeholderNft);
+    const builtTotalRarities = !collection.rarities ? buildTotalRarities(filteredNfts) : collection.rarities;
     await updateCollection(collection, {rarities: builtTotalRarities});
-    const builtRarities = buildRarities(builtTotalRarities, newNfts);
-    data = await createNfts(collectionId, enrichNfts(builtRarities, newNfts), projection);
+    const builtRarities = !collection.rarityMap ? buildRarities(builtTotalRarities, filteredNfts) : collection.rarityMap;
+    data = await createNfts(collectionId, enrichNfts(builtRarities, filteredNfts), projection);
   }
   return data;
 };

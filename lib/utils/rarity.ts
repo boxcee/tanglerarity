@@ -51,15 +51,15 @@ const buildRarities = (totalRarityScores: TotalRarities, nfts: Nft[]): Rarities 
     })
     .sort((a: EnrichedNft, b: EnrichedNft) => b.score - a.score)
     .map((eNft: EnrichedNft, idx: number): RankedNft => ({...eNft, rank: idx + 1}))
-    .reduce((acc: Rarities, {uid, rarity, score, rank}: RankedNft) => {
-      acc[uid] = {rarity, score, rank};
+    .reduce((acc: Rarities, {name, rarity, score, rank}: RankedNft) => {
+      acc[name.trim()] = {rarity, score, rank};
       return acc;
     }, {} as Rarities);
 };
 
 const enrichNfts = (rarities: Rarities, nfts: Nft[]): RankedNft[] => {
   return nfts.map((nft: Nft): RankedNft => {
-    const {rarity, score, rank} = rarities[nft.uid];
+    const {rarity, score, rank} = rarities[nft.name.trim()];
     return {...nft, rarity, score, rank};
   });
 };

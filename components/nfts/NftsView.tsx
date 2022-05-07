@@ -57,7 +57,7 @@ const NftsView: FunctionComponent<NftsViewProps> = ({collectionId}) => {
       </FormGroup>
       <ImageLoader
         collectionId={collectionId}
-        rowsPerPage={3}
+        rowsPerPage={7}
         columns={3}
         page={0}
         filter={select}
