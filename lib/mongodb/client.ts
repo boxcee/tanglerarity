@@ -1,4 +1,5 @@
 import {MongoClient} from 'mongodb';
+import config from './config';
 
 const uri = process.env.MONGODB_URI;
 const options = {};
@@ -26,6 +27,23 @@ if (process.env.NODE_ENV === 'development') {
   client = new MongoClient(uri, options);
   clientPromise = client.connect();
 }
+
+clientPromise = clientPromise.then((client: MongoClient): MongoClient => {
+  const db = client.db(config.DB_NAME);
+  const collections = db.collection(config.COLLECTIONS_COLLECTION_NAME);
+  collections.createIndex({uid: 1}, {unique: true}, (error, result) => {
+    if (error) {
+      console.error('error creating index', config.NFTS_COLLECTION_NAME, error);
+    }
+  });
+  const nfts = db.collection(config.NFTS_COLLECTION_NAME);
+  nfts.createIndex({uid: 1}, {unique: true}, (error, result) => {
+    if (error) {
+      console.error('error creating index', config.NFTS_COLLECTION_NAME, error);
+    }
+  });
+  return client;
+});
 
 // Export a module-scoped MongoClient promise. By doing this in a
 // separate module, the client can be shared across functions.

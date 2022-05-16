@@ -4,6 +4,7 @@ import Image from 'next/image';
 import ImageListItemBar from '@mui/material/ImageListItemBar';
 import IconButton from '@mui/material/IconButton';
 import ImageList from '@mui/material/ImageList';
+import LinearProgress from '@mui/material/LinearProgress';
 import {useRouter} from 'next/router';
 import {ReactNode, useEffect, useState} from 'react';
 
@@ -28,16 +29,29 @@ type ImageLoaderProps = {
   columns?: number,
   page?: number,
   filter?: {},
-  total: number
+  total: number,
+  onLoaded: (n: number) => void
 }
 
 const buildSearchBody = (filter: {}): BodyInit => {
-  return JSON.stringify({
-    $and: Object.entries(filter).map(([key, value]) => ({[`properties.${key.toLowerCase()}.value`]: value})),
-  });
+  const result = {} as { [key: string]: string[] };
+  const andFilter = Object.entries(filter)
+    .reduce((arr, [key, value]) => {
+      if (Array.isArray(value) && value.length > 0) {
+        return [...arr, {
+          $or: value.map((v) => ({[`properties.${key.toLowerCase()}.value`]: v})),
+        }];
+      } else {
+        return arr;
+      }
+    }, [] as any[]);
+  if (andFilter.length > 0) {
+    result['$and'] = andFilter;
+  }
+  return JSON.stringify(result);
 };
 
-const ImageLoader = ({collectionId, rowsPerPage, columns, page, filter, total}: ImageLoaderProps) => {
+const ImageLoader = ({collectionId, rowsPerPage, columns, page, filter, total, onLoaded}: ImageLoaderProps) => {
   const router = useRouter();
   const [isLoading, setLoading] = useState(false);
   const [data, setData] = useState({total: 0, items: []});
@@ -61,14 +75,14 @@ const ImageLoader = ({collectionId, rowsPerPage, columns, page, filter, total}: 
   }, [collectionId, rowsPerPage, columns, page, filter]);
 
   if (isLoading) {
-    return <div>Is loading...</div>;
+    return <LinearProgress sx={{m: 1}} />;
   }
 
   const handleInfoClick = (nft: RankedNft) => {
     router.push('https://soonaverse.com/nft/' + nft.uid);
   };
 
-  const {items: nfts} = data as ({ items: RankedNft[] });
+  const {items: nfts, total: totalLoaded} = data as ({ items: RankedNft[], total: number });
 
   const getSubtitle = (nft: RankedNft): ReactNode => {
     if (nft.rank && nft.score) {
@@ -76,8 +90,10 @@ const ImageLoader = ({collectionId, rowsPerPage, columns, page, filter, total}: 
     }
   };
 
+  onLoaded(totalLoaded);
+
   return (
-    <ImageList sx={{width: 750, height: 750}} cols={columns} rowHeight={250}>
+    <ImageList sx={{m: 1}} cols={columns} rowHeight={208}>
       {nfts.map((nft: RankedNft) => (
         <ImageListItem key={nft.name}>
           <Image
@@ -85,6 +101,8 @@ const ImageLoader = ({collectionId, rowsPerPage, columns, page, filter, total}: 
             src="nft.png"
             alt="NFT media"
             layout="fill"
+            placeholder="blur"
+            blurDataURL="/placeholder.jpg"
           />
           <ImageListItemBar
             title={nft.name}

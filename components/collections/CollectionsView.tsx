@@ -4,6 +4,7 @@ import ListItem from '@mui/material/ListItem';
 import IconButton from '@mui/material/IconButton';
 import ListItemText from '@mui/material/ListItemText';
 import VisibilityIcon from '@mui/icons-material/Visibility';
+import LinearProgress from '@mui/material/LinearProgress';
 import {useRouter} from 'next/router';
 import useSWR from 'swr';
 import {Collection} from 'soonaverse/dist/interfaces/models';
@@ -19,7 +20,7 @@ const CollectionsView = () => {
   }
 
   if (!data) {
-    return <>Is loading...</>;
+    return <LinearProgress sx={{m: 1}} />;
   }
 
   const handleViewClick = (collectionId: string) => {

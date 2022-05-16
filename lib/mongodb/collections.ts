@@ -30,7 +30,7 @@ const getCollection = async (uid: string, filter = {}, projection = {}): Promise
 const createCollection = async (document: Document, projection = {}): Promise<CollectionDocument> => {
   //TODO: Filter projection fields
   const mongo = await collectionHelper;
-  const createdDocument = {_id: document.uid, ...document} as CollectionDocument;
+  const createdDocument = document as CollectionDocument;
   await mongo.insertOne(createdDocument);
   return createdDocument as CollectionDocument;
 };

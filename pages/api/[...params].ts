@@ -8,6 +8,7 @@ import auth0 from '../../lib/auth0';
 import {NftDocuments} from '../../lib/mongodb/types/Nft';
 import {RankedNftDocuments} from '../../types/api/RankedNftDocuments';
 import {getOrCreateCollection} from '../../lib/mongodb/utils';
+import {Nft} from 'soonaverse/dist/interfaces/models/nft';
 
 const soon = new Soon();
 
@@ -26,17 +27,23 @@ const getOrCreateNfts = async (isAuthorized: boolean, collectionId: string, limi
   const nftsHaveNotBeenLoadedYet = !data.items || data.items.length === 0;
   const nftsHaveOnlyBeenLoadedPartly = data.items.length !== collection.sold;
   if ((nftsHaveNotBeenLoadedYet || nftsHaveOnlyBeenLoadedPartly) && Object.keys(filter).length === 0) {
-    const newNfts = await soon.getNftsByCollections([collectionId]);
-    const filteredNfts = newNfts
-      .filter(nft => !nft.placeholderNft)
-      .filter(nft => !data.items.map(nft => nft.name).includes(nft.name));
+    let filteredNfts = [] as Nft[];
+    if (nftsHaveNotBeenLoadedYet && nftsHaveOnlyBeenLoadedPartly) {
+      const newNfts = await soon.getNftsByCollections([collectionId]);
+      filteredNfts = newNfts
+        .filter(nft => !nft.placeholderNft)
+        .filter(nft => !data.items.map(nft => nft.name).includes(nft.name));
+    }
     const builtTotalRarities = !collection.rarities ? buildTotalRarities(filteredNfts) : collection.rarities;
     if (nftsHaveNotBeenLoadedYet && !nftsHaveOnlyBeenLoadedPartly) {
       await updateCollection(collection, {rarities: builtTotalRarities});
     }
     const builtRarities = !collection.rarityMap ? buildRarities(builtTotalRarities, filteredNfts) : collection.rarityMap;
-    data = await createNfts(collectionId, enrichNfts(builtRarities, filteredNfts), projection);
+    if (filteredNfts.length !== 0) {
+      data = await createNfts(collectionId, enrichNfts(builtRarities, filteredNfts), projection);
+    }
   }
+
   return data;
 };
 
@@ -52,7 +59,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const queryOffset: number = Array.isArray(skip) ? Number(skip[0]) : Number(skip);
   const sortKey: string = Array.isArray(sort) ? sort[0] : sort;
   const sortOrder: number = order === 'asc' ? 1 : -1;
-  const isAuthorized: boolean = await hasSession(req, res) || true;
+  const isAuthorized: boolean = await hasSession(req, res) || true; // TODO: Always true
 
   // Path is '/api/collections'
   if (params.length === 1 && params[0] === 'collections') {

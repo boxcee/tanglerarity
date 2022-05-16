@@ -39,8 +39,8 @@ const getNft = async (collectionUid: string, uid: string, projection = {}): Prom
 
 const createNfts = async (uid: string, documents: Document[], projection = {}): Promise<NftDocuments> => {
   const mongo = await collectionHelper;
-  const createdDocuments = documents.map(document => ({_id: document.uid, ...document}));
-  await mongo.insertMany(createdDocuments as NftDocument[]);
+  const createdDocuments = documents as NftDocument[];
+  await mongo.insertMany(createdDocuments);
   return {total: createdDocuments.length, items: createdDocuments as NftDocument[]};
 };
 

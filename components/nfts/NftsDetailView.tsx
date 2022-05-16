@@ -1,5 +1,6 @@
 import {FunctionComponent} from 'react';
 import useSWR from 'swr';
+import LinearProgress from '@mui/material/LinearProgress';
 
 const fetcher = (url: RequestInfo): any => fetch(url).then((res: Response) => res.json());
 
@@ -16,7 +17,7 @@ const NftsDetailView: FunctionComponent<NftsDetailViewProps> = ({collectionId, n
   }
 
   if (!data) {
-    return <>Is loading...</>;
+    return <LinearProgress sx={{m: 1}} />;
   }
 
   return (

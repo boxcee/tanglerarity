@@ -3,6 +3,7 @@ import {useRouter} from 'next/router';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import IconButton from '@mui/material/IconButton';
 import useSWR from 'swr';
+import LinearProgress from '@mui/material/LinearProgress';
 
 const fetcher = (url: RequestInfo): any => fetch(url).then((res: Response) => res.json());
 
@@ -19,7 +20,7 @@ const CollectionsDetailView: FunctionComponent<CollectionDetailsViewProps> = ({c
   }
 
   if (!data) {
-    return <>Is loading...</>;
+    return <LinearProgress sx={{m: 1}} />;
   }
 
   const handleViewClick = () => {
