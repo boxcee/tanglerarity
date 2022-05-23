@@ -7,3 +7,10 @@
 - [ ] Design NFT detail view
 - [ ] Design Collection detail view
 - [ ] Change design of collection overview to a design similar to the NFT overview
+- [ ] Add name filter
+- [ ] Add sorting (asc & desc)
+
+
+
+
+
