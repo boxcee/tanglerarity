@@ -26,6 +26,9 @@ const getOrCreateNfts = async (isAuthorized: boolean, collectionId: string, limi
   let data = await getNfts(collectionId, limit, skip, sort, order, filter, projection);
   const nftsHaveNotBeenLoadedYet = !data.items || data.items.length === 0;
   const nftsHaveOnlyBeenLoadedPartly = data.items.length !== collection.sold;
+
+  console.log(nftsHaveOnlyBeenLoadedPartly, nftsHaveNotBeenLoadedYet);
+
   if ((nftsHaveNotBeenLoadedYet || nftsHaveOnlyBeenLoadedPartly) && Object.keys(filter).length === 0) {
     let filteredNfts = [] as Nft[];
     if (nftsHaveNotBeenLoadedYet && nftsHaveOnlyBeenLoadedPartly) {

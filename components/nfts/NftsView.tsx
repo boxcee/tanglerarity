@@ -5,8 +5,11 @@ import Select, {SelectChangeEvent} from '@mui/material/Select';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import Input from '@mui/material/Input';
 import Switch from '@mui/material/Switch';
 import FormControlLabel from '@mui/material/FormControlLabel';
+import FormGroup from '@mui/material/FormGroup';
 import Pagination from '@mui/material/Pagination';
 import Chip from '@mui/material/Chip';
 import Collapse from '@mui/material/Collapse';
@@ -58,6 +61,24 @@ const NftsView: FunctionComponent<NftsViewProps> = ({collectionId}) => {
     setTotalLoaded(n);
   };
 
+  const handleOnClick = () => {
+    setSelect({});
+  };
+
+  const handleOnFrom = (event: ChangeEvent<HTMLInputElement>) => {
+    setSelect(prevState => ({
+      ...prevState,
+      ['from']: [`${event.target.value}`],
+    }));
+  };
+
+  const handleOnTo = (event: ChangeEvent<HTMLInputElement>) => {
+    setSelect(prevState => ({
+      ...prevState,
+      ['to']: [`${event.target.value}`],
+    }));
+  };
+
   const {rarities, total} = data as EnrichedCollection;
 
   return (
@@ -97,6 +118,40 @@ const NftsView: FunctionComponent<NftsViewProps> = ({collectionId}) => {
             </Select>
           </FormControl>
           , {key}))}
+        <FormControl sx={{m: 1, minWidth: 208}}>
+          <InputLabel htmlFor="availability-input">availability</InputLabel>
+          <Select
+            labelId="availability-input"
+            id="availability-input"
+            value={select['availability'] || ''}
+            label="availability"
+            onChange={(event) => handleOnChange('availability', event)}
+          >
+            <MenuItem value="available">available</MenuItem>
+            <MenuItem value="unavailable">unavailable</MenuItem>
+          </Select>
+        </FormControl>
+        <FormGroup row={true}>
+          <FormControl sx={{m: 1, minWidth: 208}}>
+            <Input
+              placeholder="from price"
+              type="number"
+              value={Number(select['from'])}
+              onChange={handleOnFrom}
+            />
+          </FormControl>
+          <FormControl sx={{m: 1, minWidth: 208}}>
+            <Input
+              placeholder="to price"
+              type="number"
+              value={Number(select['to'])}
+              onChange={handleOnTo}
+            />
+          </FormControl>
+          <FormControl sx={{m: 1, minWidth: 208}}>
+            <Button onClick={handleOnClick}>CLEAR</Button>
+          </FormControl>
+        </FormGroup>
       </Collapse>
       <ImageLoader
         collectionId={collectionId}

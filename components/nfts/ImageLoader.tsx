@@ -7,6 +7,7 @@ import ImageList from '@mui/material/ImageList';
 import LinearProgress from '@mui/material/LinearProgress';
 import {useRouter} from 'next/router';
 import {ReactNode, useEffect, useState} from 'react';
+import InfoIcon from '@mui/icons-material/Info';
 
 const getUrl = (collectionId: string, params: SearchParams): string => {
   const url: URL = new URL(`/api/collections/${collectionId}/nfts`, window.location.origin);
@@ -37,7 +38,19 @@ const buildSearchBody = (filter: {}): BodyInit => {
   const result = {} as { [key: string]: string[] };
   const andFilter = Object.entries(filter)
     .reduce((arr, [key, value]) => {
-      if (Array.isArray(value) && value.length > 0) {
+      if (key === 'from' && Array.isArray(value) && value.length > 0) {
+        return [...arr, {availablePrice: {$gte: Number(value[0]) * 1000000}}];
+      } else if (key === 'to' && Array.isArray(value) && value.length > 0) {
+        return [...arr, {availablePrice: {$lte: Number(value[0]) * 1000000}}];
+      } else if (key === 'availability') {
+        if (Array.isArray(value) && value.length > 0 && value[0] === 'available') {
+          return [...arr, {available: 1}];
+        } else if (Array.isArray(value) && value.length > 0 && value[0] === 'unavailable') {
+          return [...arr, {available: 0}];
+        } else {
+          return arr;
+        }
+      } else if (Array.isArray(value) && value.length > 0) {
         return [...arr, {
           $or: value.map((v) => ({[`properties.${key.toLowerCase()}.value`]: v})),
         }];
@@ -48,6 +61,7 @@ const buildSearchBody = (filter: {}): BodyInit => {
   if (andFilter.length > 0) {
     result['$and'] = andFilter;
   }
+  console.log(result);
   return JSON.stringify(result);
 };
 
@@ -92,6 +106,8 @@ const ImageLoader = ({collectionId, rowsPerPage, columns, page, filter, total, o
 
   onLoaded(totalLoaded);
 
+  console.log(nfts);
+
   return (
     <ImageList sx={{m: 1}} cols={columns} rowHeight={208}>
       {nfts.map((nft: RankedNft) => (
@@ -113,12 +129,7 @@ const ImageLoader = ({collectionId, rowsPerPage, columns, page, filter, total, o
                 aria-label={`info about ${nft.name}`}
                 onClick={() => handleInfoClick(nft)}
               >
-                <Image
-                  height={16}
-                  width={16}
-                  src="/soonaverse.ico"
-                  alt="soonaverse favicon"
-                />
+                <InfoIcon />
               </IconButton>
             }
           />
