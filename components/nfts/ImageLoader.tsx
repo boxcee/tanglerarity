@@ -99,7 +99,7 @@ const ImageLoader = ({collectionId, rowsPerPage, columns, page, filter, total, o
   }
 
   const handleInfoClick = (nft: RankedNft) => {
-    router.push('https://soonaverse.com/nft/' + nft.uid);
+    router.push(nft.wenUrl ? nft.wenUrl : 'https://soonaverse.com/nft/' + nft.uid);
   };
 
   const {items: nfts, total: totalLoaded} = data as ({ items: RankedNft[], total: number });
