@@ -8,7 +8,6 @@ import auth0 from '../../lib/auth0';
 import {NftDocuments} from '../../lib/mongodb/types/Nft';
 import {RankedNftDocuments} from '../../types/api/RankedNftDocuments';
 import {getOrCreateCollection} from '../../lib/mongodb/utils';
-import {Nft} from 'soonaverse/dist/interfaces/models/nft';
 
 const soon = new Soon();
 
@@ -25,24 +24,21 @@ const getOrCreateNfts = async (isAuthorized: boolean, collectionId: string, limi
   const projection = !isAuthorized ? {rarity: 0, rank: 0, score: 0} : {};
   let data = await getNfts(collectionId, limit, skip, sort, order, filter, projection);
   const nftsHaveNotBeenLoadedYet = !data.items || data.items.length === 0;
-  const nftsHaveOnlyBeenLoadedPartly = data.items.length !== collection.sold;
-
-  console.log(nftsHaveOnlyBeenLoadedPartly, nftsHaveNotBeenLoadedYet);
+  const nftsHaveOnlyBeenLoadedPartly = data.total !== collection.sold;
 
   if ((nftsHaveNotBeenLoadedYet || nftsHaveOnlyBeenLoadedPartly) && Object.keys(filter).length === 0) {
-    let filteredNfts = [] as Nft[];
-    if (nftsHaveNotBeenLoadedYet && nftsHaveOnlyBeenLoadedPartly) {
-      const newNfts = await soon.getNftsByCollections([collectionId]);
-      filteredNfts = newNfts
-        .filter(nft => !nft.placeholderNft)
-        .filter(nft => !data.items.map(nft => nft.name).includes(nft.name));
+    const newNfts = await soon.getNftsByCollections([collectionId]);
+    let filteredNfts = newNfts
+      .filter(nft => !nft.placeholderNft);
+    if (nftsHaveOnlyBeenLoadedPartly) {
+      filteredNfts = filteredNfts.filter(nft => !data.items.map(nft => nft.name).includes(nft.name));
     }
     const builtTotalRarities = !collection.rarities ? buildTotalRarities(filteredNfts) : collection.rarities;
-    if (nftsHaveNotBeenLoadedYet && !nftsHaveOnlyBeenLoadedPartly) {
+    if (nftsHaveNotBeenLoadedYet && nftsHaveOnlyBeenLoadedPartly) {
       await updateCollection(collection, {rarities: builtTotalRarities});
     }
     const builtRarities = !collection.rarityMap ? buildRarities(builtTotalRarities, filteredNfts) : collection.rarityMap;
-    if (filteredNfts.length !== 0) {
+    if ((nftsHaveOnlyBeenLoadedPartly && filteredNfts.length !== 0) || nftsHaveNotBeenLoadedYet) {
       data = await createNfts(collectionId, enrichNfts(builtRarities, filteredNfts), projection);
     }
   }

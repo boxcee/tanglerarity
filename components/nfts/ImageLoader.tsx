@@ -61,7 +61,6 @@ const buildSearchBody = (filter: {}): BodyInit => {
   if (andFilter.length > 0) {
     result['$and'] = andFilter;
   }
-  console.log(result);
   return JSON.stringify(result);
 };
 
@@ -98,15 +97,40 @@ const ImageLoader = ({collectionId, rowsPerPage, columns, page, filter, total, o
 
   const {items: nfts, total: totalLoaded} = data as ({ items: RankedNft[], total: number });
 
+  const getPrice = (nft: RankedNft) => {
+    if (!nft.availablePrice) {
+      return '';
+    } else {
+      let price: string | number = nft.availablePrice / 1000000;
+      let unit = '';
+      if (price >= 1000000) {
+        unit = 'Ti';
+        if (price % 1000000 === 0) {
+          price = (price / 1000000).toFixed(0);
+        } else {
+          price = (price / 1000000).toFixed(2);
+        }
+      } else if (price >= 1000) {
+        unit = 'Gi';
+        if (price % 1000 === 0) {
+          price = (price / 1000).toFixed(0);
+        } else {
+          price = (price / 1000).toFixed(2);
+        }
+      } else {
+        unit = 'Mi';
+      }
+      return `; Price: ${price} ${unit}`;
+    }
+  };
+
   const getSubtitle = (nft: RankedNft): ReactNode => {
     if (nft.rank && nft.score) {
-      return `Rank: ${nft.rank}/${total}; Score: ${nft.score.toFixed(2)}`;
+      return `Rank: ${nft.rank}/${total}${getPrice(nft)}`;
     }
   };
 
   onLoaded(totalLoaded);
-
-  console.log(nfts);
 
   return (
     <ImageList sx={{m: 1}} cols={columns} rowHeight={208}>
