@@ -68,6 +68,7 @@ const ImageLoader = ({collectionId, rowsPerPage, columns, page, filter, total, o
   const router = useRouter();
   const [isLoading, setLoading] = useState(false);
   const [data, setData] = useState({total: 0, items: []});
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const params = {
@@ -82,13 +83,19 @@ const ImageLoader = ({collectionId, rowsPerPage, columns, page, filter, total, o
     fetch(getUrl(collectionId, params), options)
       .then(res => res.json())
       .then(data => {
-        setLoading(false);
         setData(data);
-      });
+        setLoading(false);
+        setError(null);
+      })
+      .catch(setError);
   }, [collectionId, rowsPerPage, columns, page, filter]);
 
   if (isLoading) {
     return <LinearProgress sx={{m: 1}} />;
+  }
+
+  if (error) {
+    return <div>Error when loading collection. If you tried loading the first time, please refresh.</div>;
   }
 
   const handleInfoClick = (nft: RankedNft) => {
