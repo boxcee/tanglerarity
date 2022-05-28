@@ -46,7 +46,7 @@ const Search: FunctionComponent = () => {
     if (value.length !== 0 && result) {
       switch (result.groupBy) {
         case 'collections':
-          router.push(`/collections/${result.uid}`);
+          router.push(`/collections/${result.uid}/nfts`);
           break;
         case 'nfts':
           router.push(`/collections/${(result as Nft).collection}/nfts/${result.uid}`);
@@ -64,7 +64,7 @@ const Search: FunctionComponent = () => {
           styling={{height: '40px'}}
           items={options}
           inputSearchString={value}
-          placeholder="Search for name, description or address..."
+          placeholder="Search Collections, NFTs, Addresses"
           resultStringKeyName="name"
           onSearch={handleOnSearch}
           onSelect={handleOnSelect}

@@ -21,13 +21,13 @@ const CollectionsView = () => {
   }
 
   const handleViewClick = (collectionId: string) => {
-    router.push('/collections/' + collectionId);
+    router.push('/collections/' + collectionId + '/nfts');
   };
 
   const {total, items} = data;
 
   return (
-    <div style={{padding: '20px 0'}}>
+    <div className="collections-container">
       <Typography>Collections</Typography>
       <table className="collections-table">
         <thead className="table-header">
@@ -62,6 +62,13 @@ const CollectionsView = () => {
         </tbody>
       </table>
       <style jsx>{`
+        .collections-container {
+          padding: 20px 0;
+          width: 1200px;
+          margin: 4rem auto;
+          background-color: #FFFFFF;
+          box-shadow: 0px 0px 8px gray;
+        }
         .table-header {
           background-color: #EDEEF5;
         }

@@ -1,0 +1,49 @@
+.collections-container {
+  padding: 20px 0;
+  width: 1200px;
+  margin: 4rem auto;
+  background-color: #FFFFFF;
+  box-shadow: 0 0 8px gray;
+}
+
+.table-header {
+  background-color: #EDEEF5;
+}
+
+.collections-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.collections-table th {
+  text-align: left;
+}
+
+.collections-row {
+  height: 50px;
+  max-height: 75px;
+}
+
+.collections-row:hover {
+  background-color: #EDEEF5;
+}
+
+.collections-row td {
+  padding-right: 32px;
+}
+
+.collection-column {
+  width: 15%;
+}
+
+.description-column {
+  width: 100%;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.circulation-column {
+  width: 10%;
+}

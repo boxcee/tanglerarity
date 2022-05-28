@@ -16,6 +16,12 @@ import Collapse from '@mui/material/Collapse';
 import useSWR from 'swr';
 import {EnrichedCollection} from '../../types/EnrichedCollection';
 import LinearProgress from '@mui/material/LinearProgress';
+import OutlinedInput from '@mui/material/OutlinedInput';
+import InputAdornment from '@mui/material/InputAdornment';
+import IconButton from '@mui/material/IconButton';
+import Image from 'next/image';
+import SearchIcon from '@mui/icons-material/Search';
+import {Typography} from '@mui/material';
 
 const fetcher = (url: RequestInfo): any => fetch(url).then((res: Response) => res.json());
 
@@ -23,8 +29,8 @@ type NftsViewProps = {
   collectionId: string
 }
 
-const ROWS_PER_PAGE = 4;
-const COLUMNS_PER_PAGE = 8;
+const ROWS_PER_PAGE = 3;
+const COLUMNS_PER_PAGE = 6;
 
 const NftsView: FunctionComponent<NftsViewProps> = ({collectionId}) => {
   const [select, setSelect] = useState({} as ({ [key: string]: string[] }));
@@ -78,7 +84,96 @@ const NftsView: FunctionComponent<NftsViewProps> = ({collectionId}) => {
     }));
   };
 
+  const handleOnName = (event: ChangeEvent<HTMLInputElement>) => {
+    setSelect(prevState => ({
+      ...prevState,
+      ['name']: [`${event.target.value}`],
+    }));
+  };
+
+  const sanitizeKey = (key: string) => (
+    key.replace(/[-_]/, ' ').replace(/(^[a-z])|( [a-z])/g, (str: string) => str.toUpperCase())
+  );
+
   const {rarities, total} = data as EnrichedCollection;
+
+  return (
+    <div style={{display: 'flex', padding: '20px 0', margin: '4rem 0'}}>
+      <div style={{width: 450, marginRight: 40, backgroundColor: '#fff'}}>
+        {data.name}
+        <Image src="image.png" loader={() => data.bannerUrl} alt="banner img" height={250} width={250} />
+        <FormControl sx={{m: 1, width: 208}} variant="outlined">
+          <InputLabel htmlFor="outlined-adornment-name">Name Search</InputLabel>
+          <OutlinedInput
+            id="outlined-adornment-name"
+            type="search"
+            value={select['name']}
+            onChange={handleOnName}
+            endAdornment={
+              <InputAdornment position="end">
+                <IconButton
+                  aria-label="apply name filter"
+                  onClick={() => {
+                  }}
+                  edge="end"
+                >
+                  <SearchIcon />
+                </IconButton>
+              </InputAdornment>
+            }
+            label="Name Search"
+          />
+        </FormControl>
+        {Object.keys((rarities || {})).map((key: string) => cloneElement((
+          <>
+            <Typography sx={{m: 0.5}}>{sanitizeKey(key)}</Typography>
+            <FormControl sx={{m: 0.5, minWidth: 208}}>
+              <InputLabel htmlFor={`${key}-input`}>{sanitizeKey(key)}</InputLabel>
+              <Select
+                labelId={`${key}-input`}
+                id={`${key}-input`}
+                value={(select[key] || [])}
+                label={key}
+                multiple
+                onChange={(event) => handleOnChange(key, event)}
+                renderValue={(selected) => (
+                  <Box sx={{display: 'flex', flexWrap: 'wrap', gap: 0.5}}>
+                    {selected.map((value) => (
+                      <Chip key={value} label={value} />
+                    ))}
+                  </Box>
+                )}
+              >
+                {Object.keys(rarities[key]).map((trait: string) => cloneElement(
+                  (<MenuItem value={trait}>{trait}</MenuItem>)
+                  , {key: trait}))}
+              </Select>
+            </FormControl>
+          </>
+        ), {key}))}
+      </div>
+      <div style={{width: '100%', display: 'flex', flexDirection: 'column'}}>
+        <div style={{backgroundColor: '#fff', height: 75}}>IMAGES1</div>
+        <div style={{marginTop: 40, height: '100%'}}>
+          <ImageLoader
+            collectionId={collectionId}
+            rowsPerPage={ROWS_PER_PAGE}
+            columns={COLUMNS_PER_PAGE}
+            page={page}
+            filter={select}
+            total={total}
+            onLoaded={handleOnLoaded}
+          />
+        </div>
+        <div style={{display: 'flex', width: '100%', justifyContent: 'end'}}>
+          <Pagination
+            count={Math.ceil(totalLoaded / (ROWS_PER_PAGE * COLUMNS_PER_PAGE))}
+            onChange={handleOnPage}
+          />
+        </div>
+      </div>
+    </div>
+  );
 
   return (
     <>
@@ -155,10 +250,6 @@ const NftsView: FunctionComponent<NftsViewProps> = ({collectionId}) => {
         filter={select}
         total={total}
         onLoaded={handleOnLoaded}
-      />
-      <Pagination
-        count={Math.ceil(totalLoaded / (ROWS_PER_PAGE * COLUMNS_PER_PAGE))}
-        onChange={handleOnPage}
       />
     </>
   );

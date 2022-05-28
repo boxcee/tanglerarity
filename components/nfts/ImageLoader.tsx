@@ -38,7 +38,9 @@ const buildSearchBody = (filter: {}): BodyInit => {
   const result = {} as { [key: string]: string[] };
   const andFilter = Object.entries(filter)
     .reduce((arr, [key, value]) => {
-      if (key === 'from' && Array.isArray(value) && value.length > 0) {
+      if (key === 'name' && Array.isArray(value) && value.length > 0) {
+        return [...arr, {name: {$regex: `${value}`, $options: 'i'}}];
+      } else if (key === 'from' && Array.isArray(value) && value.length > 0) {
         return [...arr, {availablePrice: {$gte: Number(value[0]) * 1000000}}];
       } else if (key === 'to' && Array.isArray(value) && value.length > 0) {
         return [...arr, {availablePrice: {$lte: Number(value[0]) * 1000000}}];
@@ -141,7 +143,7 @@ const ImageLoader = ({collectionId, rowsPerPage, columns, page, filter, total, o
   onLoaded(totalLoaded);
 
   return (
-    <ImageList sx={{m: 1}} cols={columns} rowHeight={640 / rowsPerPage}>
+    <ImageList cols={columns} rowHeight={640 / rowsPerPage}>
       {nfts.map((nft: RankedNft) => (
         <ImageListItem key={nft.name}>
           <Image

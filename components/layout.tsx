@@ -24,17 +24,9 @@ const Layout: FunctionComponent<LayoutProps> = ({user, loading = false, children
       <Header />
 
       <main>
-        <div className="container">{children}</div>
+        <div>{children}</div>
       </main>
 
-      <style jsx>{`
-        .container {
-          max-width: 1200px;
-          margin: 4rem auto;
-          background-color: #FFFFFF;
-          box-shadow: 0px 0px 8px gray;
-        }
-      `}</style>
       <style jsx global>{`
         body {
           margin: 0;
