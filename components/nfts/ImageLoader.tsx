@@ -26,7 +26,7 @@ type SearchParams = {
 
 type ImageLoaderProps = {
   collectionId: string,
-  rowsPerPage?: number,
+  rowsPerPage: number,
   columns?: number,
   page?: number,
   filter?: {},
@@ -126,6 +126,7 @@ const ImageLoader = ({collectionId, rowsPerPage, columns, page, filter, total, o
         }
       } else {
         unit = 'Mi';
+        price = price.toFixed(0);
       }
       return `; Price: ${price} ${unit}`;
     }
@@ -140,7 +141,7 @@ const ImageLoader = ({collectionId, rowsPerPage, columns, page, filter, total, o
   onLoaded(totalLoaded);
 
   return (
-    <ImageList sx={{m: 1}} cols={columns} rowHeight={208}>
+    <ImageList sx={{m: 1}} cols={columns} rowHeight={640 / rowsPerPage}>
       {nfts.map((nft: RankedNft) => (
         <ImageListItem key={nft.name}>
           <Image

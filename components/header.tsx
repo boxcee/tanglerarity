@@ -1,83 +1,20 @@
-import Link from 'next/link';
 import {FunctionComponent} from 'react';
+import Search from '../components/search';
 
-type HeaderProps = {
-  user: {},
-  loading: boolean
-}
-
-const Header: FunctionComponent<HeaderProps> = ({user, loading}) => {
+const Header: FunctionComponent = () => {
   return (
     <header>
-      <nav>
-        <ul>
-          <li>
-            <Link href="/">
-              <a>Home</a>
-            </Link>
-          </li>
-          <li>
-            <Link href="/collections">
-              <a>Collections</a>
-            </Link>
-          </li>
-          {!loading &&
-            (user ? (
-              <>
-                <li>
-                  <Link href="/profile">
-                    <a>Client-rendered profile</a>
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/advanced/ssr-profile">
-                    <a>Server rendered profile (advanced)</a>
-                  </Link>
-                </li>
-                <li>
-                  <Link href={`/api/auth/logout?returnTo=${encodeURIComponent(window.location.pathname)}`}>Logout</Link>
-                </li>
-              </>
-            ) : (
-              <li>
-                <Link href={`/api/auth/login?returnTo=${encodeURIComponent(window.location.pathname)}`}>Login</Link>
-              </li>
-            ))}
-        </ul>
-      </nav>
-
+      <div className="search-input">
+        <Search />
+      </div>
       <style jsx>{`
         header {
-          padding: 0.2rem;
-          color: #fff;
-          background-color: #333;
+          background-color: #5D658B;
+          height: 75px;
         }
-        nav {
-          max-width: 42rem;
-          margin: 1.5rem auto;
-        }
-        ul {
-          display: flex;
-          list-style: none;
-          margin-left: 0;
-          padding-left: 0;
-        }
-        li {
-          margin-right: 1rem;
-        }
-        li:nth-child(2) {
-          margin-right: auto;
-        }
-        a {
-          color: #fff;
-          text-decoration: none;
-        }
-        button {
-          font-size: 1rem;
-          color: #fff;
-          cursor: pointer;
-          border: none;
-          background: none;
+        .search-input {
+          width: 500px;
+          margin: auto;
         }
       `}</style>
     </header>

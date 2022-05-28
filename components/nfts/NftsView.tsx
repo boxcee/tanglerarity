@@ -13,7 +13,6 @@ import FormGroup from '@mui/material/FormGroup';
 import Pagination from '@mui/material/Pagination';
 import Chip from '@mui/material/Chip';
 import Collapse from '@mui/material/Collapse';
-import Stack from '@mui/material/Stack';
 import useSWR from 'swr';
 import {EnrichedCollection} from '../../types/EnrichedCollection';
 import LinearProgress from '@mui/material/LinearProgress';
@@ -24,8 +23,8 @@ type NftsViewProps = {
   collectionId: string
 }
 
-const ROWS_PER_PAGE = 3;
-const COLUMNS_PER_PAGE = 3;
+const ROWS_PER_PAGE = 4;
+const COLUMNS_PER_PAGE = 8;
 
 const NftsView: FunctionComponent<NftsViewProps> = ({collectionId}) => {
   const [select, setSelect] = useState({} as ({ [key: string]: string[] }));
@@ -83,16 +82,11 @@ const NftsView: FunctionComponent<NftsViewProps> = ({collectionId}) => {
 
   return (
     <>
-      <Stack direction="row" spacing={16} sx={{m: 1}}>
-        <FormControlLabel
-          control={<Switch checked={checked} onChange={handleOnSwitch} />}
-          label="Show Filters"
-        />
-        <Pagination
-          count={Math.ceil(totalLoaded / (ROWS_PER_PAGE * COLUMNS_PER_PAGE))}
-          onChange={handleOnPage}
-        />
-      </Stack>
+      <FormControlLabel
+        sx={{m: 1}}
+        control={<Switch checked={checked} onChange={handleOnSwitch} />}
+        label="Show Filters"
+      />
       <Collapse in={checked}>
         {Object.keys((rarities || {})).map((key: string) => cloneElement(
           <FormControl sx={{m: 1, minWidth: 208}}>
@@ -149,7 +143,7 @@ const NftsView: FunctionComponent<NftsViewProps> = ({collectionId}) => {
             />
           </FormControl>
           <FormControl sx={{m: 1, minWidth: 208}}>
-            <Button onClick={handleOnClick}>CLEAR</Button>
+            <Button onClick={handleOnClick}>CLEAR ALL</Button>
           </FormControl>
         </FormGroup>
       </Collapse>
@@ -161,6 +155,10 @@ const NftsView: FunctionComponent<NftsViewProps> = ({collectionId}) => {
         filter={select}
         total={total}
         onLoaded={handleOnLoaded}
+      />
+      <Pagination
+        count={Math.ceil(totalLoaded / (ROWS_PER_PAGE * COLUMNS_PER_PAGE))}
+        onChange={handleOnPage}
       />
     </>
   );

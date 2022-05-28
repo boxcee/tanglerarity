@@ -12,8 +12,8 @@ const Layout: FunctionComponent<LayoutProps> = ({user, loading = false, children
   return (
     <>
       <Head>
-        <title>TangleRarity</title>
-        <meta name="description" content="Explore your NFTs rarity." />
+        <title>IOTA NFT TOOLS</title>
+        <meta name="description" content="Explore your NFTs rarity" />
         <link rel="icon" href="/favicon.ico" />
         <link
           rel="stylesheet"
@@ -21,7 +21,7 @@ const Layout: FunctionComponent<LayoutProps> = ({user, loading = false, children
         />
       </Head>
 
-      <Header user={user} loading={loading} />
+      <Header />
 
       <main>
         <div className="container">{children}</div>
@@ -29,14 +29,17 @@ const Layout: FunctionComponent<LayoutProps> = ({user, loading = false, children
 
       <style jsx>{`
         .container {
-          max-width: 42rem;
-          margin: 1.5rem auto;
+          max-width: 1200px;
+          margin: 4rem auto;
+          background-color: #FFFFFF;
+          box-shadow: 0px 0px 8px gray;
         }
       `}</style>
       <style jsx global>{`
         body {
           margin: 0;
           color: #333;
+          background-color: #EBEDEE;
           font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
             Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
         }

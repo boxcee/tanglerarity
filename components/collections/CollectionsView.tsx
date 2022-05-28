@@ -1,13 +1,10 @@
 import {cloneElement} from 'react';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import IconButton from '@mui/material/IconButton';
-import ListItemText from '@mui/material/ListItemText';
-import VisibilityIcon from '@mui/icons-material/Visibility';
 import LinearProgress from '@mui/material/LinearProgress';
 import {useRouter} from 'next/router';
 import useSWR from 'swr';
 import {Collection} from 'soonaverse/dist/interfaces/models';
+import {Typography} from '@mui/material';
+//import Image from 'next/image';
 
 const fetcher = (url: RequestInfo): any => fetch(url).then((res: Response) => res.json());
 
@@ -30,25 +27,76 @@ const CollectionsView = () => {
   const {total, items} = data;
 
   return (
-    <>
-      <List>
-        {items.map((collection: Collection) => cloneElement(
-          <ListItem
-            secondaryAction={
-              <IconButton edge="end" aria-label="view" onClick={() => handleViewClick(collection.uid)}>
-                <VisibilityIcon />
-              </IconButton>
-            }
-          >
-            <ListItemText
-              primary={collection.name}
-              secondary={collection.twitter}
-            />
-          </ListItem>,
-          {key: collection.uid},
-        ))}
-      </List>
-    </>
+    <div style={{padding: '20px 0'}}>
+      <Typography>Collections</Typography>
+      <table className="collections-table">
+        <thead className="table-header">
+        <tr className="collections-row">
+          <th>Collection</th>
+          <th>Description</th>
+          <th>Circulation</th>
+        </tr>
+        </thead>
+        <tbody>
+        {items.map((collection: Collection) => cloneElement((
+          <tr className="collections-row" onClick={() => handleViewClick(collection.uid)}>
+            <td className="collection-column">
+              {collection.name}
+              {/*<Image
+                alt="collection banner"
+                src="banner.png"
+                loader={() => collection.bannerUrl}
+                blurDataURL="/placeholder.jpg"
+                layout="fill"
+                placeholder="blur"
+              />*/}
+            </td>
+            <td className="description-column">
+              {collection.description}
+            </td>
+            <td className="circulation-column">
+              {collection.sold}
+            </td>
+          </tr>
+        ), {key: collection.uid}))}
+        </tbody>
+      </table>
+      <style jsx>{`
+        .table-header {
+          background-color: #EDEEF5;
+        }
+        .collections-table {
+          width: 100%;
+          border-collapse: collapse;
+        }
+        .collections-row {
+          height: 50px;
+          max-height: 75px;
+        }
+        .collections-row:hover {
+          background-color: #EDEEF5;
+        }
+        .collections-row td { 
+          padding-right: 32px;
+        }
+        .collection-column {
+          width: 15%;
+        }
+        .description-column {
+          width: 100%;
+          display: -webkit-box;
+          -webkit-line-clamp: 3;
+          -webkit-box-orient: vertical;  
+          overflow: hidden;
+        }
+        .circulation-column {
+          width: 10%;
+        }
+        th {
+          text-align: left;
+        }
+      `}</style>
+    </div>
   );
 };
 
