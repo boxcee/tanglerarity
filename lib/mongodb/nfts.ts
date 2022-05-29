@@ -22,7 +22,7 @@ const getNfts = async (uid?: string, limit?: number, skip?: number, sort?: strin
   if (sort && order) {
     cursor.sort({[sort]: order} as Sort);
   } else {
-    cursor.sort({score: -1});
+    cursor.sort({rank: -1});
   }
   const nfts = await cursor.toArray() as NftDocument[];
   return {total: await mongo.countDocuments({collection: uid}), items: nfts};

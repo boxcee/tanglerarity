@@ -31,7 +31,8 @@ type ImageLoaderProps = {
   page?: number,
   filter?: {},
   total: number,
-  onLoaded: (n: number) => void
+  onLoaded: (n: number) => void,
+  sort: { [key: string]: string }
 }
 
 const buildSearchBody = (filter: {}): BodyInit => {
@@ -40,10 +41,14 @@ const buildSearchBody = (filter: {}): BodyInit => {
     .reduce((arr, [key, value]) => {
       if (key === 'name' && Array.isArray(value) && value.length > 0) {
         return [...arr, {name: {$regex: `${value}`, $options: 'i'}}];
-      } else if (key === 'from' && Array.isArray(value) && value.length > 0) {
+      } else if (key === 'fromPrice' && Array.isArray(value) && value.length > 0) {
         return [...arr, {availablePrice: {$gte: Number(value[0]) * 1000000}}];
-      } else if (key === 'to' && Array.isArray(value) && value.length > 0) {
+      } else if (key === 'toPrice' && Array.isArray(value) && value.length > 0) {
         return [...arr, {availablePrice: {$lte: Number(value[0]) * 1000000}}];
+      } else if (key === 'fromRank' && Array.isArray(value) && value.length > 0) {
+        return [...arr, {rank: {$gte: Number(value[0])}}];
+      } else if (key === 'toRank' && Array.isArray(value) && value.length > 0) {
+        return [...arr, {rank: {$lte: Number(value[0])}}];
       } else if (key === 'availability') {
         if (Array.isArray(value) && value.length > 0 && value[0] === 'available') {
           return [...arr, {available: 1}];
@@ -66,7 +71,7 @@ const buildSearchBody = (filter: {}): BodyInit => {
   return JSON.stringify(result);
 };
 
-const ImageLoader = ({collectionId, rowsPerPage, columns, page, filter, total, onLoaded}: ImageLoaderProps) => {
+const ImageLoader = ({collectionId, rowsPerPage, columns, page, filter, total, onLoaded, sort}: ImageLoaderProps) => {
   const router = useRouter();
   const [isLoading, setLoading] = useState(false);
   const [data, setData] = useState({total: 0, items: []});
@@ -76,6 +81,8 @@ const ImageLoader = ({collectionId, rowsPerPage, columns, page, filter, total, o
     const params = {
       limit: ((rowsPerPage || 3) * (columns || 3)),
       skip: ((page || 0) * (rowsPerPage || 3) * (columns || 3)),
+      sort: (sort['key'] || 'rank'),
+      order: (sort['order'] || 'asc'),
     };
     const options = {
       method: filter && Object.keys(filter).length > 0 ? 'POST' : 'GET',
@@ -90,7 +97,7 @@ const ImageLoader = ({collectionId, rowsPerPage, columns, page, filter, total, o
         setError(null);
       })
       .catch(setError);
-  }, [collectionId, rowsPerPage, columns, page, filter]);
+  }, [collectionId, rowsPerPage, columns, page, filter, sort]);
 
   if (isLoading) {
     return <LinearProgress sx={{m: 1}} />;
@@ -144,8 +151,8 @@ const ImageLoader = ({collectionId, rowsPerPage, columns, page, filter, total, o
 
   return (
     <ImageList cols={columns} rowHeight={640 / rowsPerPage}>
-      {nfts.map((nft: RankedNft) => (
-        <ImageListItem key={nft.name}>
+      {nfts.map((nft: RankedNft, idx: number) => (
+        <ImageListItem key={`${nft.name}${idx}`}>
           <Image
             loader={() => nft.media}
             src="nft.png"
