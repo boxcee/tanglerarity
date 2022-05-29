@@ -99,7 +99,13 @@ const NftsView: FunctionComponent<NftsViewProps> = ({collectionId}) => {
 
   return (
     <div style={{display: 'flex', padding: '20px 0', margin: '4rem 0'}}>
-      <div style={{width: 450, marginRight: 40, backgroundColor: '#fff'}}>
+      <div style={{
+        width: 450,
+        marginRight: 40,
+        backgroundColor: '#fff',
+        filter: 'drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.25))',
+        borderRadius: '0 12px 12px 0',
+      }}>
         {data.name}
         <Image src="image.png" loader={() => data.bannerUrl} alt="banner img" height={250} width={250} />
         <FormControl sx={{m: 1, width: 208}} variant="outlined">
@@ -153,7 +159,11 @@ const NftsView: FunctionComponent<NftsViewProps> = ({collectionId}) => {
         ), {key}))}
       </div>
       <div style={{width: '100%', display: 'flex', flexDirection: 'column'}}>
-        <div style={{backgroundColor: '#fff', height: 75}}>IMAGES1</div>
+        <div style={{
+          backgroundColor: '#fff', height: 75, filter: 'drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.25))',
+          borderRadius: '12px 0 0 12px',
+        }}>IMAGES1
+        </div>
         <div style={{marginTop: 40, height: '100%'}}>
           <ImageLoader
             collectionId={collectionId}
