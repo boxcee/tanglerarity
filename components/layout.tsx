@@ -19,6 +19,10 @@ const Layout: FunctionComponent<LayoutProps> = ({user, loading = false, children
           rel="stylesheet"
           href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
         />
+        <link
+          rel="stylesheet"
+          href="https://use.typekit.net/ddt4mdi.css"
+        />
       </Head>
 
       <Header />

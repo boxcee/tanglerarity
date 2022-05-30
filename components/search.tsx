@@ -61,7 +61,7 @@ const Search: FunctionComponent = () => {
     <div style={{paddingTop: 15.5}}>
       <span>
         <ReactSearchAutocomplete
-          styling={{height: '40px'}}
+          styling={{height: '40px', fontFamily: 'Montserrat'}}
           items={options}
           inputSearchString={value}
           placeholder="Search Collections, NFTs, Addresses"

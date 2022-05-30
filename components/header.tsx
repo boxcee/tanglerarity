@@ -21,10 +21,7 @@ const Header: FunctionComponent = () => {
   const [open, setOpen] = useState(false);
 
   const handleOpen = () => setOpen(true);
-  const handleClose = () => {
-    console.log('close');
-    setOpen(false);
-  };
+  const handleClose = () => setOpen(false);
 
   return (
     <header>
@@ -43,7 +40,7 @@ const Header: FunctionComponent = () => {
         <div style={{paddingTop: 15.5, marginLeft: 20}}>
           <Button
             variant="contained"
-            component="span" sx={{height: 40, borderRadius: 25}}
+            component="span" sx={{height: 40, borderRadius: 25, fontFamily: 'Montserrat'}}
             onClick={handleOpen}
           >
             Upload
