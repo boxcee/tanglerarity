@@ -62,7 +62,7 @@ const CollectionsView = () => {
                         blurDataURL="/placeholder.jpg"
                       />
                     </div>
-                    <div style={{width: 100}}>{collection.name}</div>
+                    <div className="collection-name" style={{width: 100}}>{collection.name}</div>
                   </div>
                 </td>
                 <td className="description-column">
@@ -78,6 +78,12 @@ const CollectionsView = () => {
         </div>
       )}
       <style jsx>{`
+        .collection-name {
+          display: -webkit-box;
+          -webkit-line-clamp: 3;
+          -webkit-box-orient: vertical;  
+          overflow: hidden;
+        }
         .collections-container {
           width: 1200px;
           margin: 4rem auto;
