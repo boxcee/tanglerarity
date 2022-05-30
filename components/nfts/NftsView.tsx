@@ -91,15 +91,30 @@ const NftsView: FunctionComponent<NftsViewProps> = ({collectionId}) => {
   return (
     <div style={{display: 'flex', padding: '20px 0', margin: '4rem 0'}}>
       <div style={{
-        width: 450,
+        width: 400,
         marginRight: 40,
         backgroundColor: '#fff',
         filter: 'drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.25))',
         borderRadius: '0 12px 12px 0',
       }}>
-        <Typography sx={{m: 0.5}} align="center">{data.name}</Typography>
-        <Image src="image.png" loader={() => data.bannerUrl} alt="banner img" height={250} width={250} />
-        <FormControl sx={{m: 1, width: 208}} variant="outlined">
+        <Typography
+          sx={{
+            fontFamily: 'Montserrat',
+            fontWeight: 500,
+            marginTop: '14px',
+            marginLeft: '60px',
+            marginRight: '60px',
+            fontSize: '24px',
+            marginBottom: '7px',
+          }}
+          align="center"
+        >
+          {data.name}
+        </Typography>
+        <div style={{marginLeft: '59px', marginBottom: '38px'}}>
+          <Image src={data.bannerUrl} alt="banner img" height={200} width={200} objectFit="cover" />
+        </div>
+        <FormControl style={{marginLeft: '29px', marginRight: '29px'}} variant="outlined">
           <InputLabel htmlFor="outlined-adornment-name">Name Search</InputLabel>
           <OutlinedInput
             id="outlined-adornment-name"
@@ -192,46 +207,44 @@ const NftsView: FunctionComponent<NftsViewProps> = ({collectionId}) => {
         <div style={{
           backgroundColor: '#fff', height: 75, filter: 'drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.25))',
           borderRadius: '12px 0 0 12px',
+          flexDirection: 'row',
+          display: 'flex',
+          alignItems: 'center',
         }}>
-          <FormControl sx={{m: 0.5, minWidth: 208}}>
-            <InputLabel htmlFor="sort-by-input">sort by</InputLabel>
+          <div style={{marginLeft: '30px', width: 215, display: 'flex', alignItems: 'center'}}>
+            <label style={{marginRight: '13px', fontFamily: 'Montserrat', fontWeight: 600}}>Sort by</label>
             <Select
-              labelId="sort-by-input"
-              id="sort-by-input"
-              value={[(sort['key'] || '')]}
-              label="sort by"
+              value={[(sort['key'] || 'rank')]}
               onChange={(event) => handleOnSort('key', event)}
+              style={{height: 40, borderRadius: 10, width: 137}}
             >
               <MenuItem value="rank">Rank</MenuItem>
               <MenuItem value="availablePrice">Price</MenuItem>
             </Select>
-          </FormControl>
-          <FormControl sx={{m: 0.5, minWidth: 208}}>
-            <InputLabel htmlFor="order-input">order</InputLabel>
+          </div>
+          <div style={{marginLeft: '50px', width: 215, display: 'flex', alignItems: 'center'}}>
+            <label style={{marginRight: '13px', fontFamily: 'Montserrat', fontWeight: 600}}>Order</label>
             <Select
-              labelId="order-input"
-              id="order-input"
-              value={[(sort['order'] || '')]}
-              label="order"
+              value={[(sort['order'] || 'asc')]}
               onChange={(event) => handleOnSort('order', event)}
+              style={{height: 40, borderRadius: 10, width: 137}}
             >
               <MenuItem value="asc">Ascending</MenuItem>
               <MenuItem value="desc">Descending</MenuItem>
             </Select>
-          </FormControl>
-          <FormControl sx={{m: 0.5, minWidth: 208}}>
-            <InputLabel htmlFor="availability-input">availability</InputLabel>
+          </div>
+          <div style={{marginLeft: '50px', width: 215, display: 'flex', alignItems: 'center'}}>
+            <label style={{marginRight: '13px', fontFamily: 'Montserrat', fontWeight: 600}}>Listings</label>
             <Select
-              labelId="availability-input"
-              id="availability-input"
-              value={select['availability'] || ''}
-              label="availability"
+              value={select['availability'] || 'all'}
               onChange={(event) => handleOnChange('availability', event)}
+              style={{height: 40, borderRadius: 10, width: 137}}
             >
-              <MenuItem value="available">available</MenuItem>
-              <MenuItem value="unavailable">unavailable</MenuItem>
+              <MenuItem value="all">All</MenuItem>
+              <MenuItem value="available">Available</MenuItem>
+              <MenuItem value="unavailable">Unavailable</MenuItem>
             </Select>
-          </FormControl>
+          </div>
         </div>
         <div style={{marginTop: 40, height: '100%'}}>
           <ImageLoader
