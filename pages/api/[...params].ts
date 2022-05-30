@@ -4,7 +4,7 @@ import {getCollections, updateCollection} from '../../lib/mongodb/collections';
 import {createNfts, getNft, getNfts} from '../../lib/mongodb/nfts';
 import {buildRarities, buildTotalRarities, enrichNfts} from '../../lib/utils/rarity';
 import web3 from 'web3';
-import auth0 from '../../lib/auth0';
+//import auth0 from '../../lib/auth0';
 import {NftDocuments} from '../../lib/mongodb/types/Nft';
 import {RankedNftDocuments} from '../../types/api/RankedNftDocuments';
 import {getOrCreateCollection} from '../../lib/mongodb/utils';
@@ -47,8 +47,9 @@ const getOrCreateNfts = async (isAuthorized: boolean, collectionId: string, limi
 };
 
 const hasSession = async (req: NextApiRequest, res: NextApiResponse): Promise<boolean> => {
-  const session = await auth0.getSession(req, res);
-  return !(!session || !session.user);
+  //const session = await auth0.getSession(req, res);
+  //return !(!session || !session.user);
+  return true;
 };
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
