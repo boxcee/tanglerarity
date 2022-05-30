@@ -9,7 +9,7 @@ A tool to examine the rarity of your IOTA tangle NFTs.
 First, run the database:
 
 ```bash
-docker run --restart always --name mongodb -p 27017:27017 -e MONGO_INITDB_ROOT_USERNAME=tanglerarity -e MONGO_INITDB_ROOT_PASSWORD=raritytanlge mongo:5.0.8
+docker run -d --restart always --name mongodb -p 27017:27017 -e MONGO_INITDB_ROOT_USERNAME=tanglerarity -e MONGO_INITDB_ROOT_PASSWORD=raritytangle mongo:5.0.8
 ```
 
 Second, copy your [.env.local.toconfigure](.env.local.toconfigure):
