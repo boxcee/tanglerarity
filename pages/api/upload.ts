@@ -5,6 +5,7 @@ import web3 from 'web3';
 import {getOrCreateCollection} from '../../lib/mongodb/utils';
 import {updateCollection} from '../../lib/mongodb/collections';
 import {Nft} from 'soonaverse/dist/interfaces/models/nft';
+import formidable from 'formidable';
 
 type CsvType = {
   [key: string]: string
@@ -35,14 +36,30 @@ const recordMapper = (record: CsvType) => {
 };
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const {body, query: {collection: collectionParam}} = req;
+  const {query: {collection: collectionParam}} = req;
+  const data: { originalFilename: string | null, mimetype: string | null, buffer: Buffer } = await new Promise((resolve, reject) => {
+    const form = formidable();
+    let buffer = Buffer.from('');
+    form.onPart = (part => {
+      const {originalFilename, mimetype} = part;
+      part.on('data', data => buffer += data);
+      part.on('end', () => {
+        resolve({originalFilename, mimetype, buffer});
+      });
+    });
+    form.parse(req);
+  });
   const collectionId = Array.isArray(collectionParam) ? collectionParam[0] : collectionParam;
   if (!collectionParam || !web3.utils.isAddress(collectionId)) {
     res.status(400).send('collection id is missing');
   } else {
     const collection = await getOrCreateCollection(true, collectionId);
     if (collection && !collection.rarities) {
-      const parsed = parse(body, {columns: true, skip_empty_lines: true, on_record: recordMapper});
+      const parsed = parse(data.buffer, {
+        columns: true,
+        skip_empty_lines: true,
+        on_record: recordMapper,
+      });
       const rarities = buildTotalRarities(parsed);
       const rarityMap = buildRarities(rarities, parsed);
       await updateCollection(collection, {rarities, rarityMap});
@@ -58,8 +75,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
 export const config = {
   api: {
-    bodyParser: {
-      sizeLimit: '10mb',
-    },
+    bodyParser: false,
   },
 };

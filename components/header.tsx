@@ -21,7 +21,10 @@ const Header: FunctionComponent = () => {
   const [open, setOpen] = useState(false);
 
   const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+  const handleClose = () => {
+    console.log('close');
+    setOpen(false);
+  };
 
   return (
     <header>
