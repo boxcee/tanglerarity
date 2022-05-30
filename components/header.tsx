@@ -4,6 +4,8 @@ import Button from '@mui/material/Button';
 import Modal from '@mui/material/Modal';
 import Box from '@mui/material/Box';
 import Upload from '../components/upload';
+import {Typography} from '@mui/material';
+import Link from 'next/link';
 
 const style = {
   position: 'absolute' as 'absolute',
@@ -33,11 +35,24 @@ const Header: FunctionComponent = () => {
           <Upload onClose={handleClose} />
         </Box>
       </Modal>
-      <div style={{display: 'flex', justifyContent: 'center'}}>
-        <div className="search-input">
+      <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+        <div style={{paddingTop: 15.5, justifySelf: 'start', flexGrow: 2}}>
+          <Typography
+            style={{
+              color: '#fff',
+              fontFamily: 'Montserrat',
+              fontWeight: 500,
+              fontSize: 32,
+              marginLeft: 30,
+            }}
+          >
+            <Link href="/">IOTA NFT TOOLS</Link>
+          </Typography>
+        </div>
+        <div className="search-input" style={{flexGrow: 1}}>
           <Search />
         </div>
-        <div style={{paddingTop: 15.5, marginLeft: 20}}>
+        <div style={{paddingTop: 15.5, marginLeft: 20, flexGrow: 4}}>
           <Button
             variant="contained"
             component="span" sx={{height: 40, borderRadius: 25, fontFamily: 'Montserrat'}}
