@@ -5,7 +5,7 @@ import web3 from 'web3';
 import NftsView from '../components/nfts/NftsView';
 import NftsDetailView from '../components/nfts/NftsDetailView';
 import Layout from '../components/layout';
-import {useFetchUser} from '../lib/user';
+//import {useFetchUser} from '../lib/user';
 
 type ParamsProps = {
   paths: string[]
@@ -18,7 +18,7 @@ type ParamsContext = {
 }
 
 const Params: NextPage<ParamsProps> = ({paths}) => {
-  const {user, loading} = useFetchUser();
+  //const {user, loading} = useFetchUser();
 
   let pageToRender;
 
@@ -35,7 +35,7 @@ const Params: NextPage<ParamsProps> = ({paths}) => {
   }
 
   return (
-    <Layout user={user} loading={loading}>
+    <Layout user={{}} loading={false}>
       {pageToRender}
     </Layout>
   );

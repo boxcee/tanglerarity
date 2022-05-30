@@ -1,41 +1,50 @@
-import {ChangeEvent, FunctionComponent} from 'react';
+import {FunctionComponent, useState} from 'react';
 import Search from '../components/search';
 import Button from '@mui/material/Button';
-import {styled} from '@mui/material/styles';
+import Modal from '@mui/material/Modal';
+import Box from '@mui/material/Box';
+import Upload from '../components/upload';
 
-const Input = styled('input')({
-  display: 'none',
-});
+const style = {
+  position: 'absolute' as 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 400,
+  bgcolor: 'background.paper',
+  border: '2px solid #000',
+  boxShadow: 24,
+  p: 4,
+};
 
 const Header: FunctionComponent = () => {
-  const handleOnUpload = (event: ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files) {
-      const file = event.target.files[0];
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('filename', file.name);
-      fetch('/api/upload', {method: 'POST', body: formData})
-        .then(console.log)
-        .catch(console.error);
-    }
-  };
+  const [open, setOpen] = useState(false);
+
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
 
   return (
     <header>
+      <Modal
+        open={open}
+        onClose={handleClose}
+      >
+        <Box sx={style}>
+          <Upload onClose={handleClose} />
+        </Box>
+      </Modal>
       <div style={{display: 'flex', justifyContent: 'center'}}>
         <div className="search-input">
           <Search />
         </div>
         <div style={{paddingTop: 15.5, marginLeft: 20}}>
-          <label htmlFor="contained-button-file">
-            <Input accept="text/csv" id="contained-button-file" type="file" onChange={handleOnUpload} />
-            <Button
-              variant="contained"
-              component="span" sx={{height: 40, borderRadius: 25}}
-            >
-              Upload
-            </Button>
-          </label>
+          <Button
+            variant="contained"
+            component="span" sx={{height: 40, borderRadius: 25}}
+            onClick={handleOpen}
+          >
+            Upload
+          </Button>
         </div>
       </div>
       <style jsx>{`
