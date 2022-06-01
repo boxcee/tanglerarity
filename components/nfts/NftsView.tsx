@@ -32,7 +32,6 @@ const COLUMNS_PER_PAGE = 6;
 const NftsView: FunctionComponent<NftsViewProps> = ({collectionId}) => {
   const [select, setSelect] = useState({} as ({ [key: string]: string[] }));
   const [sort, setSort] = useState({key: 'rank', order: 'asc'} as ({ [key: string]: string }));
-  const [checked, setChecked] = useState(false);
   const [page, setPage] = useState(0);
   const [totalLoaded, setTotalLoaded] = useState(0);
   const {data, error} = useSWR(`/api/collections/${collectionId}`, fetcher);
@@ -46,9 +45,10 @@ const NftsView: FunctionComponent<NftsViewProps> = ({collectionId}) => {
   }
 
   const handleOnChange = (key: string, event: SelectChangeEvent<string[]>) => {
+    const value = Array.isArray(event.target.value) ? event.target.value : [event.target.value];
     setSelect({
       ...select,
-      [key]: Array.isArray(event.target.value) ? event.target.value : [event.target.value],
+      [key]: value.filter(v => v !== ''),
     });
   };
 
@@ -57,10 +57,6 @@ const NftsView: FunctionComponent<NftsViewProps> = ({collectionId}) => {
       ...sort,
       [key]: Array.isArray(event.target.value) ? event.target.value[0] : event.target.value,
     });
-  };
-
-  const handleOnSwitch = () => {
-    setChecked((prev) => !prev);
   };
 
   const handleOnPage = (event: ChangeEvent<unknown>, page: number) => {
@@ -96,6 +92,11 @@ const NftsView: FunctionComponent<NftsViewProps> = ({collectionId}) => {
         backgroundColor: '#fff',
         filter: 'drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.25))',
         borderRadius: '0 12px 12px 0',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'left',
+        paddingLeft: 29,
+        paddingRight: 29,
       }}>
         <Typography
           sx={{
@@ -111,11 +112,22 @@ const NftsView: FunctionComponent<NftsViewProps> = ({collectionId}) => {
         >
           {data.name}
         </Typography>
-        <div style={{marginLeft: '59px', marginBottom: '38px'}}>
-          <Image src={data.bannerUrl} alt="banner img" height={200} width={200} objectFit="cover" />
+        <div style={{marginBottom: '38px', alignSelf: 'center'}}>
+          <Image
+            src={data.bannerUrl}
+            alt="banner img"
+            height={200}
+            width={200}
+            objectFit="cover"
+            style={{borderRadius: 10}}
+          />
         </div>
-        <FormControl style={{marginLeft: '29px', marginRight: '29px'}} variant="outlined">
-          <InputLabel htmlFor="outlined-adornment-name">Name Search</InputLabel>
+        <FormControl sx={{width: 259, alignSelf: 'center'}} style={{marginBottom: 16}} variant="outlined">
+          <InputLabel
+            style={{fontFamily: 'Inter', fontWeight: 400, fontSize: 16, color: '#9E9E9E'}}
+            htmlFor="outlined-adornment-name">
+            Name Search
+          </InputLabel>
           <OutlinedInput
             id="outlined-adornment-name"
             type="search"
@@ -137,21 +149,24 @@ const NftsView: FunctionComponent<NftsViewProps> = ({collectionId}) => {
           />
         </FormControl>
         {Object.keys((rarities || {})).map((key: string) => cloneElement((
-          <>
-            <Typography sx={{m: 0.5}}>{sanitizeKey(key)}</Typography>
-            <FormControl sx={{m: 0.5, minWidth: 208}}>
-              <InputLabel htmlFor={`${key}-input`}>{sanitizeKey(key)}</InputLabel>
+          <div style={{marginBottom: 16, alignSelf: 'center'}}>
+            <Typography
+              sx={{width: 259, fontFamily: 'Montserrat', fontWeight: 600, fontSize: 16, color: '#4C5862'}}
+              style={{paddingLeft: 12, marginBottom: 5}}
+            >
+              {sanitizeKey(key)}
+            </Typography>
+            <FormControl sx={{width: 259}}>
               <Select
-                labelId={`${key}-input`}
-                id={`${key}-input`}
-                value={(select[key] || [])}
-                label={key}
+                value={(select[key] || [''])}
                 multiple
                 onChange={(event) => handleOnChange(key, event)}
-                renderValue={(selected) => (
+                renderValue={(selected) => selected.length === 1 && selected[0] === '' ? (
+                  <span style={{color: '#9E9E9E', fontWeight: 400, fontFamily: 'Inter'}}>Select Traits</span>
+                ) : (
                   <Box sx={{display: 'flex', flexWrap: 'wrap', gap: 0.5}}>
                     {selected.map((value) => (
-                      <Chip key={value} label={value} />
+                      <Chip size="small" key={value} label={value} />
                     ))}
                   </Box>
                 )}
@@ -161,10 +176,10 @@ const NftsView: FunctionComponent<NftsViewProps> = ({collectionId}) => {
                   , {key: trait}))}
               </Select>
             </FormControl>
-          </>
+          </div>
         ), {key}))}
-        <FormGroup row={true}>
-          <FormControl sx={{m: 0.5, minWidth: 208}}>
+        <FormGroup row={true} sx={{width: 259, alignSelf: 'center'}}>
+          <FormControl>
             <Input
               placeholder="from price"
               type="number"
@@ -172,7 +187,7 @@ const NftsView: FunctionComponent<NftsViewProps> = ({collectionId}) => {
               onChange={handleOnCustom('fromPrice')}
             />
           </FormControl>
-          <FormControl sx={{m: 0.5, minWidth: 208}}>
+          <FormControl>
             <Input
               placeholder="to price"
               type="number"
@@ -181,8 +196,8 @@ const NftsView: FunctionComponent<NftsViewProps> = ({collectionId}) => {
             />
           </FormControl>
         </FormGroup>
-        <FormGroup row={true}>
-          <FormControl sx={{m: 0.5, minWidth: 208}}>
+        <FormGroup row={true} sx={{width: 259, alignSelf: 'center'}}>
+          <FormControl>
             <Input
               placeholder="from rank"
               type="number"
@@ -190,7 +205,7 @@ const NftsView: FunctionComponent<NftsViewProps> = ({collectionId}) => {
               onChange={handleOnCustom('fromRank')}
             />
           </FormControl>
-          <FormControl sx={{m: 0.5, minWidth: 208}}>
+          <FormControl>
             <Input
               placeholder="to rank"
               type="number"
@@ -199,8 +214,8 @@ const NftsView: FunctionComponent<NftsViewProps> = ({collectionId}) => {
             />
           </FormControl>
         </FormGroup>
-        <FormControl sx={{m: 0.5, minWidth: 208}}>
-          <Button onClick={handleOnClick}>CLEAR ALL</Button>
+        <FormControl sx={{width: 259, alignSelf: 'center'}}>
+          <Button onClick={handleOnClick} variant="contained">CLEAR ALL</Button>
         </FormControl>
       </div>
       <div style={{width: '100%', display: 'flex', flexDirection: 'column'}}>
