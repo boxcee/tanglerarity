@@ -1,13 +1,8 @@
 import {RankedNft} from '../../types/RankedNft';
-import ImageListItem from '@mui/material/ImageListItem';
-import Image from 'next/image';
-import ImageListItemBar from '@mui/material/ImageListItemBar';
-import IconButton from '@mui/material/IconButton';
-import ImageList from '@mui/material/ImageList';
 import LinearProgress from '@mui/material/LinearProgress';
 import {useRouter} from 'next/router';
 import {ReactNode, useEffect, useState} from 'react';
-import InfoIcon from '@mui/icons-material/Info';
+import Card from '../card';
 
 const getUrl = (collectionId: string, params: SearchParams): string => {
   const url: URL = new URL(`/api/collections/${collectionId}/nfts`, window.location.origin);
@@ -107,8 +102,8 @@ const ImageLoader = ({collectionId, rowsPerPage, columns, page, filter, total, o
     return <div>Error when loading collection. If you tried loading the first time, please refresh.</div>;
   }
 
-  const handleInfoClick = (nft: RankedNft) => {
-    router.push(nft.wenUrl ? nft.wenUrl : 'https://soonaverse.com/nft/' + nft.uid);
+  const handleInfoClick = (uid: string, wenUrl?: string) => {
+    router.push(wenUrl ? wenUrl : 'https://soonaverse.com/nft/' + uid);
   };
 
   const {items: nfts, total: totalLoaded} = data as ({ items: RankedNft[], total: number });
@@ -150,33 +145,19 @@ const ImageLoader = ({collectionId, rowsPerPage, columns, page, filter, total, o
   onLoaded(totalLoaded);
 
   return (
-    <ImageList cols={columns} rowHeight={640 / rowsPerPage}>
+    <div style={{display: 'flex', justifyContent: 'start', flexWrap: 'wrap'}}>
       {nfts.map((nft: RankedNft, idx: number) => (
-        <ImageListItem key={`${nft.name}${idx}`}>
-          <Image
-            loader={() => nft.media}
-            src="nft.png"
-            alt="NFT media"
-            layout="fill"
-            placeholder="blur"
-            blurDataURL="/placeholder.jpg"
-          />
-          <ImageListItemBar
-            title={nft.name}
-            subtitle={getSubtitle(nft)}
-            actionIcon={
-              <IconButton
-                sx={{color: 'rgba(255, 255, 255, 0.54)'}}
-                aria-label={`info about ${nft.name}`}
-                onClick={() => handleInfoClick(nft)}
-              >
-                <InfoIcon />
-              </IconButton>
-            }
-          />
-        </ImageListItem>
+        <Card
+          key={`${nft.name}${idx}`}
+          img={nft.media}
+          name={nft.name}
+          rank={`${nft.rank}/${total}`}
+          uid={nft.uid}
+          wenUrl={nft.wenUrl}
+          onClick={handleInfoClick}
+        />
       ))}
-    </ImageList>
+    </div>
   );
 };
 

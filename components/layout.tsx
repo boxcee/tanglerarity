@@ -23,6 +23,10 @@ const Layout: FunctionComponent<LayoutProps> = ({user, loading = false, children
           rel="stylesheet"
           href="https://use.typekit.net/ddt4mdi.css"
         />
+        <link
+          rel="stylesheet"
+          href="https://rsms.me/inter/inter.css"
+        />
       </Head>
 
       <Header />
