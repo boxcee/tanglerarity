@@ -6,8 +6,6 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import Input from '@mui/material/Input';
-import FormGroup from '@mui/material/FormGroup';
 import Pagination from '@mui/material/Pagination';
 import Chip from '@mui/material/Chip';
 import useSWR from 'swr';
@@ -74,7 +72,7 @@ const NftsView: FunctionComponent<NftsViewProps> = ({collectionId}) => {
   const handleOnCustom = (key: string) => (event: ChangeEvent<HTMLInputElement>) => {
     setSelect(prevState => ({
       ...prevState,
-      [key]: [`${event.target.value}`],
+      [key]: Number.isNaN(Number(event.target.value)) ? ['0'] : [`${event.target.value}`],
     }));
   };
 
@@ -148,6 +146,62 @@ const NftsView: FunctionComponent<NftsViewProps> = ({collectionId}) => {
             label="Name Search"
           />
         </FormControl>
+        <div style={{display: 'flex', width: 259, alignSelf: 'center', flexDirection: 'column', marginBottom: 16}}>
+          <Typography
+            sx={{width: 259, fontFamily: 'Montserrat', fontWeight: 600, fontSize: 16, color: '#4C5862'}}
+            style={{paddingLeft: 12, marginBottom: 5}}
+          >
+            Price
+          </Typography>
+          <div style={{display: 'flex', flexDirection: 'row'}}>
+            <OutlinedInput
+              style={{width: 99, borderTopRightRadius: 0, borderBottomRightRadius: 0}}
+              placeholder="Min"
+              onChange={handleOnCustom('fromPrice')}
+              value={select['fromPrice'] ? Number(select['fromPrice']) : null}
+            />
+            <OutlinedInput
+              style={{width: 99, borderRadius: 0}}
+              placeholder="Max"
+              onChange={handleOnCustom('toPrice')}
+              value={select['toPrice'] ? Number(select['toPrice']) : null}
+            />
+            <Button variant="contained" style={{
+              borderTopLeftRadius: 0,
+              borderTopRightRadius: 10,
+              borderBottomLeftRadius: 0,
+              borderBottomRightRadius: 10,
+            }}>GO</Button>
+          </div>
+        </div>
+        <div style={{display: 'flex', width: 259, alignSelf: 'center', flexDirection: 'column', marginBottom: 16}}>
+          <Typography
+            sx={{width: 259, fontFamily: 'Montserrat', fontWeight: 600, fontSize: 16, color: '#4C5862'}}
+            style={{paddingLeft: 12, marginBottom: 5}}
+          >
+            Rank
+          </Typography>
+          <div style={{display: 'flex', flexDirection: 'row'}}>
+            <OutlinedInput
+              style={{width: 99, borderTopRightRadius: 0, borderBottomRightRadius: 0}}
+              placeholder="Min"
+              onChange={handleOnCustom('fromRank')}
+              value={select['fromRank'] ? Number(select['fromRank']) : null}
+            />
+            <OutlinedInput
+              style={{width: 99, borderRadius: 0}}
+              placeholder="Max"
+              onChange={handleOnCustom('toRank')}
+              value={select['toRank'] ? Number(select['toRank']) : null}
+            />
+            <Button variant="contained" style={{
+              borderTopLeftRadius: 0,
+              borderTopRightRadius: 10,
+              borderBottomLeftRadius: 0,
+              borderBottomRightRadius: 10,
+            }}>GO</Button>
+          </div>
+        </div>
         {Object.keys((rarities || {})).map((key: string) => cloneElement((
           <div style={{marginBottom: 16, alignSelf: 'center'}}>
             <Typography
@@ -178,42 +232,6 @@ const NftsView: FunctionComponent<NftsViewProps> = ({collectionId}) => {
             </FormControl>
           </div>
         ), {key}))}
-        <FormGroup row={true} sx={{width: 259, alignSelf: 'center'}}>
-          <FormControl>
-            <Input
-              placeholder="from price"
-              type="number"
-              value={Number(select['fromPrice'])}
-              onChange={handleOnCustom('fromPrice')}
-            />
-          </FormControl>
-          <FormControl>
-            <Input
-              placeholder="to price"
-              type="number"
-              value={Number(select['toPrice'])}
-              onChange={handleOnCustom('toPrice')}
-            />
-          </FormControl>
-        </FormGroup>
-        <FormGroup row={true} sx={{width: 259, alignSelf: 'center'}}>
-          <FormControl>
-            <Input
-              placeholder="from rank"
-              type="number"
-              value={Number(select['fromRank'])}
-              onChange={handleOnCustom('fromRank')}
-            />
-          </FormControl>
-          <FormControl>
-            <Input
-              placeholder="to rank"
-              type="number"
-              value={Number(select['toRank'])}
-              onChange={handleOnCustom('toRank')}
-            />
-          </FormControl>
-        </FormGroup>
         <FormControl sx={{width: 259, alignSelf: 'center'}}>
           <Button onClick={handleOnClick} variant="contained">CLEAR ALL</Button>
         </FormControl>
