@@ -83,7 +83,7 @@ const NftsView: FunctionComponent<NftsViewProps> = ({collectionId}) => {
   const {rarities, total} = data as EnrichedCollection;
 
   return (
-    <div style={{display: 'flex', padding: '20px 0', margin: '4rem 0'}}>
+    <div style={{display: 'flex', padding: '20px 0 0 0', margin: '4rem 0 0', height: '100%'}}>
       <div style={{
         width: 400,
         marginRight: 40,
@@ -95,6 +95,7 @@ const NftsView: FunctionComponent<NftsViewProps> = ({collectionId}) => {
         alignItems: 'left',
         paddingLeft: 29,
         paddingRight: 29,
+        borderBottomRightRadius: 0,
       }}>
         <Typography
           sx={{
@@ -232,7 +233,7 @@ const NftsView: FunctionComponent<NftsViewProps> = ({collectionId}) => {
             </FormControl>
           </div>
         ), {key}))}
-        <FormControl sx={{width: 259, alignSelf: 'center'}}>
+        <FormControl sx={{width: 259, alignSelf: 'center', marginBottom: 16}}>
           <Button onClick={handleOnClick} variant="contained">CLEAR ALL</Button>
         </FormControl>
       </div>
