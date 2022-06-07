@@ -1,6 +1,12 @@
 import {NextApiRequest, NextApiResponse} from 'next';
 import {parse} from 'csv-parse/sync';
-import {getRarities, buildTotalRarities} from '../../lib/utils/rarity';
+import {
+  getRarities,
+  buildTotalRarities,
+  getEnrichedNfts,
+  sortEnrichedNfts,
+  getRankedNfts,
+} from '../../lib/utils/rarity';
 import web3 from 'web3';
 import {getOrCreateCollection} from '../../lib/mongodb/utils';
 import {updateCollection} from '../../lib/mongodb/collections';
@@ -55,13 +61,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   } else {
     const collection = await getOrCreateCollection(true, collectionId);
     if (collection && !collection.rarities) {
-      const parsed = parse(data.buffer, {
+      const parsed: Nft[] = parse(data.buffer, {
         columns: true,
         skip_empty_lines: true,
         on_record: recordMapper,
       });
       const rarities = buildTotalRarities(parsed);
-      const rarityMap = getRarities(rarities, parsed);
+      const enrichedNfts = getEnrichedNfts(rarities, parsed);
+      const sortedEnrichedNfts = sortEnrichedNfts(enrichedNfts);
+      const rankedNfts = getRankedNfts(sortedEnrichedNfts);
+      const rarityMap = getRarities(rankedNfts);
       await updateCollection(collection, {rarities, rarityMap});
       res.status(200).json(rarities);
     } else if (collection) {
