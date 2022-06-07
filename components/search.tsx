@@ -37,7 +37,7 @@ const Search: FunctionComponent = () => {
   const formatResult = (item: Option) => {
     return (
       <>
-        {item.groupBy === 'collections' ? 'COLLECTION:' : 'NFT:'} {item.name}
+        <i>{item.groupBy === 'collections' ? 'COLLECTION:' : 'NFT:'}</i> {item.name}
       </>
     );
   };

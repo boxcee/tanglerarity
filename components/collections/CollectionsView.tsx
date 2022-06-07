@@ -1,21 +1,47 @@
-import {cloneElement, useState} from 'react';
+import {ChangeEvent, cloneElement, useState} from 'react';
 import LinearProgress from '@mui/material/LinearProgress';
 import {useRouter} from 'next/router';
 import useSWR from 'swr';
 import {Collection} from 'soonaverse/dist/interfaces/models';
 import {Typography} from '@mui/material';
 import Image from 'next/image';
+import Pagination from '@mui/material/Pagination';
+
+const COLLECTIONS_PER_PAGE = 10;
+
+type SearchParams = {
+  limit?: number
+  skip?: number
+  sort?: string
+  order?: string
+}
+
+const getUrl = (params: SearchParams): string => {
+  if (global.window) {
+    const url: URL = new URL('/api/collections', window.location.origin);
+    Object.entries(params).forEach(([key, value]) => {
+      url.searchParams.append(key, String(value));
+    });
+    return url.toString();
+  } else {
+    return '';
+  }
+};
 
 const fetcher = (url: RequestInfo): any => fetch(url).then((res: Response) => res.json());
 
 const CollectionsView = () => {
   const router = useRouter();
-  const {data, error} = useSWR('/api/collections', fetcher);
-  const [images, setImages] = useState({});
+  const [page, setPage] = useState(1);
+  const {data, error} = useSWR(getUrl({limit: COLLECTIONS_PER_PAGE, skip: (page - 1) * COLLECTIONS_PER_PAGE}), fetcher);
 
   if (error) {
     return <>{JSON.stringify(error, null, 2)}</>;
   }
+
+  const handleOnPage = (event: ChangeEvent<unknown>, page: number) => {
+    setPage(page);
+  };
 
   const handleViewClick = (collectionId: string) => {
     router.push('/collections/' + collectionId + '/nfts');
@@ -75,6 +101,13 @@ const CollectionsView = () => {
             ), {key: collection.uid}))}
             </tbody>
           </table>
+          <div style={{display: 'flex', width: '100%', justifyContent: 'center'}}>
+            <Pagination
+              count={Math.ceil(data.total / COLLECTIONS_PER_PAGE)}
+              onChange={handleOnPage}
+              page={page}
+            />
+          </div>
         </div>
       )}
       <style jsx>{`
@@ -86,10 +119,11 @@ const CollectionsView = () => {
         }
         .collections-container {
           width: 1200px;
-          margin: 4rem auto;
+          margin: 4rem auto 0 auto;
           background-color: #FFFFFF;
           box-shadow: 0px 0px 8px gray;
-          border-radius: 25px;
+          border-radius: 25px 25px 0 0;
+          padding-bottom: 2rem;
         }
         .table-header > tr {
           background-color: #EDEEF5;

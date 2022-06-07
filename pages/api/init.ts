@@ -28,8 +28,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         });
         previousHeight = await page.evaluate('document.body.scrollHeight');
         await page.evaluate('window.scrollTo(0, document.body.scrollHeight)');
-        await page.waitForFunction(`document.body.scrollHeight > ${previousHeight}`);
-        await page.waitForTimeout(2000);
+        await page.waitForFunction(`document.body.scrollHeight > ${previousHeight}`, {timeout: 1000 * 60});
       }
     } catch (error) {
       console.error('error', error);
