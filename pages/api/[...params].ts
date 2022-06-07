@@ -2,7 +2,14 @@ import {NextApiRequest, NextApiResponse} from 'next';
 import {Soon} from 'soonaverse';
 import {getCollections, updateCollection} from '../../lib/mongodb/collections';
 import {createNfts, getNft, getNfts} from '../../lib/mongodb/nfts';
-import {buildRarities, buildTotalRarities, enrichNfts} from '../../lib/utils/rarity';
+import {
+  buildTotalRarities,
+  enrichNfts,
+  getEnrichedNfts,
+  getRankedNfts,
+  getRarities,
+  sortEnrichedNfts,
+} from '../../lib/utils/rarity';
 import web3 from 'web3';
 //import auth0 from '../../lib/auth0';
 import {NftDocuments} from '../../lib/mongodb/types/Nft';
@@ -37,9 +44,12 @@ const getOrCreateNfts = async (isAuthorized: boolean, collectionId: string, limi
     if (nftsHaveNotBeenLoadedYet && nftsHaveOnlyBeenLoadedPartly) {
       await updateCollection(collection, {rarities: builtTotalRarities});
     }
-    const builtRarities = !collection.rarityMap ? buildRarities(builtTotalRarities, filteredNfts) : collection.rarityMap;
     if ((nftsHaveOnlyBeenLoadedPartly && filteredNfts.length !== 0) || nftsHaveNotBeenLoadedYet) {
-      data = await createNfts(collectionId, enrichNfts(builtRarities, filteredNfts), projection);
+      const enrichedNfts = getEnrichedNfts(builtTotalRarities, filteredNfts);
+      const sortedEnrichedNfts = sortEnrichedNfts(enrichedNfts);
+      const rankedNfts = getRankedNfts(sortedEnrichedNfts);
+      const builtRarities = !collection.rarityMap ? getRarities(rankedNfts) : collection.rarityMap;
+      data = await createNfts(collectionId, enrichNfts(builtRarities, sortedEnrichedNfts), projection);
     }
   }
 

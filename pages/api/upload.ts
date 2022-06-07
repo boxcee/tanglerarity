@@ -1,6 +1,6 @@
 import {NextApiRequest, NextApiResponse} from 'next';
 import {parse} from 'csv-parse/sync';
-import {buildRarities, buildTotalRarities} from '../../lib/utils/rarity';
+import {getRarities, buildTotalRarities} from '../../lib/utils/rarity';
 import web3 from 'web3';
 import {getOrCreateCollection} from '../../lib/mongodb/utils';
 import {updateCollection} from '../../lib/mongodb/collections';
@@ -61,7 +61,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         on_record: recordMapper,
       });
       const rarities = buildTotalRarities(parsed);
-      const rarityMap = buildRarities(rarities, parsed);
+      const rarityMap = getRarities(rarities, parsed);
       await updateCollection(collection, {rarities, rarityMap});
       res.status(200).json(rarities);
     } else if (collection) {

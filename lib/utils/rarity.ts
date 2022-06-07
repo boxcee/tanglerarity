@@ -38,7 +38,7 @@ const getNameWithNumber = (name: string, idx: number) => {
   }
 };
 
-const buildRarities = (totalRarityScores: TotalRarities, nfts: Nft[]): Rarities => {
+const getEnrichedNfts = (totalRarityScores: TotalRarities, nfts: Nft[]): EnrichedNft[] => {
   const totalNfts = nfts.length;
   return nfts
     .map((nft: Nft): EnrichedNft => {
@@ -56,9 +56,19 @@ const buildRarities = (totalRarityScores: TotalRarities, nfts: Nft[]): Rarities 
         }
       }
       return {rarity, score, ...nft};
-    })
-    .sort((a: EnrichedNft, b: EnrichedNft) => b.score - a.score)
-    .map((eNft: EnrichedNft, idx: number): RankedNft => ({...eNft, rank: idx + 1}))
+    });
+};
+
+const sortEnrichedNfts = (nfts: EnrichedNft[]): EnrichedNft[] => {
+  return nfts.sort((a: EnrichedNft, b: EnrichedNft) => b.score - a.score);
+};
+
+const getRankedNfts = (nfts: EnrichedNft[]): RankedNft[] => {
+  return nfts.map((eNft: EnrichedNft, idx: number): RankedNft => ({...eNft, rank: idx + 1}));
+};
+
+const getRarities = (nfts: RankedNft[]): Rarities => {
+  return nfts
     .reduce((acc: Rarities, {name, rarity, score, rank}: RankedNft, idx: number) => {
       acc[getNameWithNumber(name, idx)] = {rarity, score, rank};
       return acc;
@@ -72,4 +82,4 @@ const enrichNfts = (rarities: Rarities, nfts: Nft[]): RankedNft[] => {
   });
 };
 
-export {buildRarities, buildTotalRarities, enrichNfts};
+export {getRarities, buildTotalRarities, enrichNfts, sortEnrichedNfts, getRankedNfts, getEnrichedNfts};
