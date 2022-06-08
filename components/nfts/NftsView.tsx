@@ -1,4 +1,4 @@
-import {ChangeEvent, cloneElement, FunctionComponent, useState} from 'react';
+import {ChangeEvent, cloneElement, FunctionComponent, useRef, useState} from 'react';
 import ImageLoader from './ImageLoader';
 import FormControl from '@mui/material/FormControl';
 import Select, {SelectChangeEvent} from '@mui/material/Select';
@@ -24,10 +24,13 @@ type NftsViewProps = {
   collectionId: string
 }
 
-const ROWS_PER_PAGE = 3;
-const COLUMNS_PER_PAGE = 6;
+const CARD_COUNT = 7;
+const ROW_COUNT = 3;
+const CARD_WIDTH = 200;
+const CARD_MARGIN_RIGHT = 20;
 
 const NftsView: FunctionComponent<NftsViewProps> = ({collectionId}) => {
+  const imageContainer = useRef(null);
   const [select, setSelect] = useState({} as ({ [key: string]: string[] }));
   const [sort, setSort] = useState({key: 'rank', order: 'asc'} as ({ [key: string]: string }));
   const [page, setPage] = useState(0);
@@ -56,6 +59,12 @@ const NftsView: FunctionComponent<NftsViewProps> = ({collectionId}) => {
       [key]: Array.isArray(event.target.value) ? event.target.value[0] : event.target.value,
     });
   };
+
+  let cardCount = CARD_COUNT;
+  if (imageContainer.current) {
+    const {clientWidth} = imageContainer.current;
+    cardCount = Math.floor(clientWidth / (CARD_WIDTH + CARD_MARGIN_RIGHT)) || CARD_COUNT;
+  }
 
   const handleOnPage = (event: ChangeEvent<unknown>, page: number) => {
     setPage(page - 1);
@@ -280,11 +289,11 @@ const NftsView: FunctionComponent<NftsViewProps> = ({collectionId}) => {
             </Select>
           </div>
         </div>
-        <div style={{marginTop: 40, height: '100%'}}>
+        <div style={{marginTop: 40}} ref={imageContainer}>
           <ImageLoader
             collectionId={collectionId}
-            rowsPerPage={ROWS_PER_PAGE}
-            columns={COLUMNS_PER_PAGE}
+            cardsPerRow={cardCount}
+            rows={ROW_COUNT}
             page={page}
             filter={select}
             total={total}
@@ -292,9 +301,9 @@ const NftsView: FunctionComponent<NftsViewProps> = ({collectionId}) => {
             onLoaded={handleOnLoaded}
           />
         </div>
-        <div style={{display: 'flex', width: '100%', justifyContent: 'end'}}>
+        <div style={{display: 'flex', width: '100%', justifyContent: 'start'}}>
           <Pagination
-            count={Math.ceil(totalLoaded / (ROWS_PER_PAGE * COLUMNS_PER_PAGE))}
+            count={Math.ceil(totalLoaded / (cardCount * ROW_COUNT))}
             onChange={handleOnPage}
           />
         </div>

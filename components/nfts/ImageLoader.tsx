@@ -1,7 +1,6 @@
 import {RankedNft} from '../../types/RankedNft';
 import LinearProgress from '@mui/material/LinearProgress';
-import {useRouter} from 'next/router';
-import {ReactNode, useEffect, useState} from 'react';
+import {useEffect, useMemo, useState} from 'react';
 import Card from '../card';
 
 const getUrl = (collectionId: string, params: SearchParams): string => {
@@ -21,8 +20,8 @@ type SearchParams = {
 
 type ImageLoaderProps = {
   collectionId: string,
-  rowsPerPage: number,
-  columns?: number,
+  cardsPerRow: number,
+  rows: number,
   page?: number,
   filter?: {},
   total: number,
@@ -66,16 +65,18 @@ const buildSearchBody = (filter: {}): BodyInit => {
   return JSON.stringify(result);
 };
 
-const ImageLoader = ({collectionId, rowsPerPage, columns, page, filter, total, onLoaded, sort}: ImageLoaderProps) => {
-  const router = useRouter();
+const DEFAULT_CARDS_PER_ROW = 7;
+const DEFAULT_ROWS = 3;
+
+const ImageLoader = ({collectionId, cardsPerRow, rows, page, filter, total, onLoaded, sort}: ImageLoaderProps) => {
   const [isLoading, setLoading] = useState(false);
   const [data, setData] = useState({total: 0, items: []});
   const [error, setError] = useState(null);
 
   useEffect(() => {
     const params = {
-      limit: ((rowsPerPage || 3) * (columns || 3)),
-      skip: ((page || 0) * (rowsPerPage || 3) * (columns || 3)),
+      limit: (cardsPerRow || DEFAULT_CARDS_PER_ROW) * (rows || DEFAULT_ROWS),
+      skip: (page || 0) * (cardsPerRow || DEFAULT_CARDS_PER_ROW) * (rows || DEFAULT_ROWS),
       sort: (sort['key'] || 'rank'),
       order: (sort['order'] || 'asc'),
     };
@@ -92,7 +93,23 @@ const ImageLoader = ({collectionId, rowsPerPage, columns, page, filter, total, o
         setError(null);
       })
       .catch(setError);
-  }, [collectionId, rowsPerPage, columns, page, filter, sort]);
+  }, [collectionId, cardsPerRow, rows, page, filter, sort]);
+
+  const {items: nfts, total: totalLoaded} = data as ({ items: RankedNft[], total: number });
+
+  const cards = useMemo(() => (
+    nfts.map((nft: RankedNft, idx: number) => (
+      <Card
+        key={`${nft.name}${idx}`}
+        img={nft.media}
+        name={nft.name}
+        rank={`${nft.rank}/${total}`}
+        uid={nft.uid}
+        wenUrl={nft.wenUrl}
+        onClick={handleInfoClick}
+      />
+    ))
+  ), [nfts, total]);
 
   if (isLoading) {
     return <LinearProgress sx={{m: 1}} />;
@@ -106,57 +123,11 @@ const ImageLoader = ({collectionId, rowsPerPage, columns, page, filter, total, o
     window.open(wenUrl ? wenUrl : 'https://soonaverse.com/nft/' + uid, '_blank');
   };
 
-  const {items: nfts, total: totalLoaded} = data as ({ items: RankedNft[], total: number });
-
-  const getPrice = (nft: RankedNft) => {
-    if (!nft.availablePrice) {
-      return '';
-    } else {
-      let price: string | number = nft.availablePrice / 1000000;
-      let unit = '';
-      if (price >= 1000000) {
-        unit = 'Ti';
-        if (price % 1000000 === 0) {
-          price = (price / 1000000).toFixed(0);
-        } else {
-          price = (price / 1000000).toFixed(2);
-        }
-      } else if (price >= 1000) {
-        unit = 'Gi';
-        if (price % 1000 === 0) {
-          price = (price / 1000).toFixed(0);
-        } else {
-          price = (price / 1000).toFixed(2);
-        }
-      } else {
-        unit = 'Mi';
-        price = price.toFixed(0);
-      }
-      return `; Price: ${price} ${unit}`;
-    }
-  };
-
-  const getSubtitle = (nft: RankedNft): ReactNode => {
-    if (nft.rank && nft.score) {
-      return `Rank: ${nft.rank}/${total}${getPrice(nft)}`;
-    }
-  };
-
   onLoaded(totalLoaded);
 
   return (
     <div style={{display: 'flex', justifyContent: 'start', flexWrap: 'wrap'}}>
-      {nfts.map((nft: RankedNft, idx: number) => (
-        <Card
-          key={`${nft.name}${idx}`}
-          img={nft.media}
-          name={nft.name}
-          rank={`${nft.rank}/${total}`}
-          uid={nft.uid}
-          wenUrl={nft.wenUrl}
-          onClick={handleInfoClick}
-        />
-      ))}
+      {cards}
     </div>
   );
 };
