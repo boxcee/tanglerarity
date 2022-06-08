@@ -1,10 +1,11 @@
-import {FunctionComponent, useEffect, useState} from 'react';
+import {FunctionComponent, SyntheticEvent, useEffect, useState} from 'react';
 import {useRouter} from 'next/router';
 import {Collection} from 'soonaverse/dist/interfaces/models';
 import {RankedNft} from '../types/RankedNft';
 import {Nft} from 'soonaverse/dist/interfaces/models/nft';
-import {ReactSearchAutocomplete} from 'react-search-autocomplete';
-import {CircularProgress} from '@mui/material';
+import Autocomplete from '@mui/material/Autocomplete';
+import CircularProgress from '@mui/material/CircularProgress';
+import TextField from '@mui/material/TextField';
 
 type Option = (Collection | RankedNft) & {
   groupBy: string
@@ -12,14 +13,16 @@ type Option = (Collection | RankedNft) & {
 
 const Search: FunctionComponent = () => {
   const router = useRouter();
-  const [options, setOptions] = useState([] as Option[]);
-  const [value, setValue] = useState('');
-  const [isLoading, setLoading] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [options, setOptions] = useState<Option[]>([]);
+  const [inputValue, setInputValue] = useState('');
+  const [value, setValue] = useState<Option>();
 
   useEffect(() => {
-    if (value.length > 2) {
+    if (inputValue.length > 2) {
       setLoading(true);
-      fetch('/api/search?q=' + value)
+      fetch('/api/search?q=' + inputValue)
         .then(res => res.json())
         .then(data => {
           setOptions(data);
@@ -28,22 +31,14 @@ const Search: FunctionComponent = () => {
     } else {
       setOptions([]);
     }
-  }, [value]);
+  }, [inputValue]);
 
-  const handleOnSearch = (keyword: string, results: Option[]) => {
-    setValue(keyword);
+  const handleOnInput = (event: SyntheticEvent, value: string) => {
+    setInputValue(value);
   };
 
-  const formatResult = (item: Option) => {
-    return (
-      <>
-        <i>{item.groupBy === 'collections' ? 'COLLECTION:' : 'NFT:'}</i> {item.name}
-      </>
-    );
-  };
-
-  const handleOnSelect = (result: Option) => {
-    if (value.length !== 0 && result) {
+  const handleOnSelect = (event: SyntheticEvent, result: Option | null) => {
+    if (inputValue.length !== 0 && result) {
       switch (result.groupBy) {
         case 'collections':
           router.push(`/collections/${result.uid}/nfts`);
@@ -54,23 +49,52 @@ const Search: FunctionComponent = () => {
         default:
         // Nothing
       }
+      setValue(result);
     }
   };
 
   return (
     <div style={{paddingTop: 15.5}}>
       <span>
-        <ReactSearchAutocomplete
-          styling={{height: '40px', fontFamily: 'Montserrat'}}
-          items={options}
-          inputSearchString={value}
-          placeholder="Search Collections, NFTs, Addresses"
-          resultStringKeyName="name"
-          onSearch={handleOnSearch}
-          onSelect={handleOnSelect}
-          formatResult={formatResult}
+        <Autocomplete
+          open={open}
+          onOpen={() => setOpen(true)}
+          onClose={() => setOpen(false)}
+          options={options}
+          loading={loading}
+          onInputChange={handleOnInput}
+          inputValue={inputValue}
+          groupBy={(option) => option.groupBy.toUpperCase()}
+          getOptionLabel={(option) => option.name}
+          filterOptions={(x) => x}
+          onChange={handleOnSelect}
+          value={value}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              InputProps={{
+                ...params.InputProps,
+                style: {
+                  backgroundColor: '#fff',
+                  borderRadius: 10,
+                  fontFamily: 'Inter',
+                  fontWeight: 400,
+                  border: '0 solid black',
+                  height: 40,
+                  padding: '0 0 0 10px',
+                  color: 'rgb(76, 88, 98)',
+                },
+                placeholder: 'Search Collections, NFTs, Addresses',
+                endAdornment: (
+                  <>
+                    {loading ? <CircularProgress color="inherit" size={20} /> : null}
+                    {params.InputProps.endAdornment}
+                  </>
+                ),
+              }}
+            />
+          )}
         />
-        {isLoading ? <CircularProgress /> : null}
       </span>
     </div>
   );
