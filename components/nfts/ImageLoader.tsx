@@ -1,7 +1,7 @@
 import {RankedNft} from '../../types/RankedNft';
 import LinearProgress from '@mui/material/LinearProgress';
-import {useEffect, useMemo, useState} from 'react';
-import Card from '../card';
+import {useEffect, useState} from 'react';
+import NftCards from './NftCards';
 
 const getUrl = (collectionId: string, params: SearchParams): string => {
   const url: URL = new URL(`/api/collections/${collectionId}/nfts`, window.location.origin);
@@ -97,20 +97,6 @@ const ImageLoader = ({collectionId, cardsPerRow, rows, page, filter, total, onLo
 
   const {items: nfts, total: totalLoaded} = data as ({ items: RankedNft[], total: number });
 
-  const cards = useMemo(() => (
-    nfts.map((nft: RankedNft, idx: number) => (
-      <Card
-        key={`${nft.name}${idx}`}
-        img={nft.media}
-        name={nft.name}
-        rank={`${nft.rank}/${total}`}
-        uid={nft.uid}
-        wenUrl={nft.wenUrl}
-        onClick={handleInfoClick}
-      />
-    ))
-  ), [nfts, total]);
-
   if (isLoading) {
     return <LinearProgress sx={{m: 1}} />;
   }
@@ -119,17 +105,9 @@ const ImageLoader = ({collectionId, cardsPerRow, rows, page, filter, total, onLo
     return <div>Error when loading collection. If you tried loading the first time, please refresh.</div>;
   }
 
-  const handleInfoClick = (uid: string, wenUrl?: string) => {
-    window.open(wenUrl ? wenUrl : 'https://soonaverse.com/nft/' + uid, '_blank');
-  };
-
   onLoaded(totalLoaded);
 
-  return (
-    <div style={{display: 'flex', justifyContent: 'start', flexWrap: 'wrap'}}>
-      {cards}
-    </div>
-  );
+  return <NftCards total={total} nfts={nfts} />;
 };
 
 export default ImageLoader;

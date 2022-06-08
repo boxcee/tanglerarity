@@ -1,17 +1,17 @@
 import {NextApiRequest, NextApiResponse} from 'next';
 import {parse} from 'csv-parse/sync';
 import {
-  getRarities,
   buildTotalRarities,
   getEnrichedNfts,
-  sortEnrichedNfts,
   getRankedNfts,
+  getRarities,
+  sortEnrichedNfts,
 } from '../../lib/utils/rarity';
 import web3 from 'web3';
-import {getOrCreateCollection} from '../../lib/mongodb/utils';
 import {updateCollection} from '../../lib/mongodb/collections';
 import {Nft} from 'soonaverse/dist/interfaces/models/nft';
 import formidable from 'formidable';
+import {getOrCreateCollection} from '../../lib/api';
 
 type CsvType = {
   [key: string]: string

@@ -1,4 +1,4 @@
-import {ChangeEvent, cloneElement, FunctionComponent, useRef, useState} from 'react';
+import {ChangeEvent, cloneElement, FunctionComponent, useEffect, useRef, useState} from 'react';
 import ImageLoader from './ImageLoader';
 import FormControl from '@mui/material/FormControl';
 import Select, {SelectChangeEvent} from '@mui/material/Select';
@@ -36,6 +36,20 @@ const NftsView: FunctionComponent<NftsViewProps> = ({collectionId}) => {
   const [page, setPage] = useState(0);
   const [totalLoaded, setTotalLoaded] = useState(0);
   const {data, error} = useSWR(`/api/collections/${collectionId}`, fetcher);
+  const [cardDimensions, setCardDimensions] = useState({
+    clientWidth: 0,
+  });
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (imageContainer.current) {
+        const {clientWidth} = imageContainer.current;
+        setCardDimensions({clientWidth});
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   if (error) {
     return <>{JSON.stringify(error, null, 2)}</>;
@@ -64,6 +78,9 @@ const NftsView: FunctionComponent<NftsViewProps> = ({collectionId}) => {
   if (imageContainer.current) {
     const {clientWidth} = imageContainer.current;
     cardCount = Math.floor(clientWidth / (CARD_WIDTH + CARD_MARGIN_RIGHT)) || CARD_COUNT;
+  }
+  if (cardDimensions.clientWidth) {
+    cardCount = Math.floor(cardDimensions.clientWidth / (CARD_WIDTH + CARD_MARGIN_RIGHT)) || CARD_COUNT;
   }
 
   const handleOnPage = (event: ChangeEvent<unknown>, page: number) => {
