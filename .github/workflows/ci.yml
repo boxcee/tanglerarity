@@ -4,9 +4,21 @@ on:
   push:
     branches: main
 
+env:
+  MONGODB_URI=mongodb://mongodb:mongodb@localhost:27017/?retryWrites=true&w=majority
+
 jobs:
   publish:
     runs-on: ubuntu-latest
+
+    services:
+      mongodb:
+        image: mongo:5.0.8
+        ports:
+          - 27017:27017
+        env:
+          MONGO_INITDB_ROOT_USERNAME: mongodb
+          MONGO_INITDB_ROOT_PASSWORD: mongodb
 
     steps:
       - name: Docker Login
