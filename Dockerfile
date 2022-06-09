@@ -9,6 +9,10 @@ RUN npm ci
 # Rebuild the source code only when needed
 FROM node:16-alpine AS builder
 WORKDIR /app
+
+ENV MONGODB_URI ""
+ENV NODE_ENV production
+
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
