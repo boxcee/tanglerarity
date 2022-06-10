@@ -46,7 +46,7 @@ const Header: FunctionComponent = () => {
               marginLeft: 30,
             }}
           >
-            <Link href="/">TangleRarity</Link>
+            <Link href="/">TANGLE RARITY</Link>
           </Typography>
         </div>
         <div className="search-input" style={{flexGrow: 1}}>

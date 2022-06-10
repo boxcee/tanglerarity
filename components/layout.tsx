@@ -12,7 +12,7 @@ const Layout: FunctionComponent<LayoutProps> = ({user, loading = false, children
   return (
     <>
       <Head>
-        <title>TangleRarity</title>
+        <title>TANGLE RARITY</title>
         <meta name="description" content="Explore your NFTs rarity" />
         <link rel="icon" href="/favicon.ico" />
         <link
