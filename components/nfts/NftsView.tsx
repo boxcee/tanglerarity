@@ -17,6 +17,7 @@ import IconButton from '@mui/material/IconButton';
 import Image from 'next/image';
 import SearchIcon from '@mui/icons-material/Search';
 import {Typography} from '@mui/material';
+import config from '../config';
 
 const fetcher = (url: RequestInfo): any => fetch(url).then((res: Response) => res.json());
 
@@ -26,8 +27,6 @@ type NftsViewProps = {
 
 const CARD_COUNT = 7;
 const ROW_COUNT = 3;
-const CARD_WIDTH = 200;
-const CARD_MARGIN_RIGHT = 20;
 
 const NftsView: FunctionComponent<NftsViewProps> = ({collectionId}) => {
   const imageContainer = useRef(null);
@@ -77,10 +76,10 @@ const NftsView: FunctionComponent<NftsViewProps> = ({collectionId}) => {
   let cardCount = CARD_COUNT;
   if (imageContainer.current) {
     const {clientWidth} = imageContainer.current;
-    cardCount = Math.floor(clientWidth / (CARD_WIDTH + CARD_MARGIN_RIGHT)) || CARD_COUNT;
+    cardCount = Math.floor(clientWidth / (config.CARD_WIDTH + config.CARD_RIGHT_MARGIN)) || CARD_COUNT;
   }
   if (cardDimensions.clientWidth) {
-    cardCount = Math.floor(cardDimensions.clientWidth / (CARD_WIDTH + CARD_MARGIN_RIGHT)) || CARD_COUNT;
+    cardCount = Math.floor(cardDimensions.clientWidth / (config.CARD_WIDTH + config.CARD_RIGHT_MARGIN)) || CARD_COUNT;
   }
 
   const handleOnPage = (event: ChangeEvent<unknown>, page: number) => {

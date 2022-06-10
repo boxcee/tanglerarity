@@ -21,6 +21,8 @@ const NftCards: FunctionComponent<NftCardsProps> = ({total, nfts}) => {
         rank={`${nft.rank}/${total}`}
         uid={nft.uid}
         wenUrl={nft.wenUrl}
+        price={nft.availablePrice}
+        properties={nft.properties}
         onClick={handleInfoClick}
       />
     ))

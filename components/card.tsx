@@ -1,44 +1,84 @@
-import {FunctionComponent} from 'react';
+import {FunctionComponent, MouseEvent, useState} from 'react';
 import Image from 'next/image';
 import Button from '@mui/material/Button';
+import Popover from '@mui/material/Popover';
+import config from '../components/config';
 
 type CardProps = {
   img: string,
   name: string,
   rank: string,
+  price?: number,
+  properties?: { [key: string]: { value: string, label: string } },
   onClick: (uid: string, wenUrl?: string) => void,
   uid: string,
   wenUrl?: string,
 };
 
-const Card: FunctionComponent<CardProps> = ({img, name, rank, onClick, uid, wenUrl}) => {
+const formatPrice = (price: number): string => {
+  let mi = price / 1000000;
+  let result = '';
+  if (mi >= 1000000) {
+    mi = mi / 1000000;
+    result = 'Ti';
+  } else if (mi >= 1000) {
+    mi = mi / 1000;
+    result = 'Gi';
+  } else {
+    result = 'Mi';
+  }
+  return `${mi.toFixed(mi % 1 > 0 ? 2 : 0)} ${result}`;
+};
+
+const sanitizeKey = (key: string) => (
+  key.replace(/[-_]/, ' ').replace(/(^[a-z])|( [a-z])/g, (str: string) => str.toUpperCase())
+);
+
+const Card: FunctionComponent<CardProps> = (props) => {
+  const {img, name, rank, price, properties, onClick, uid, wenUrl} = props;
+
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+
   const handleOnClick = () => {
     onClick(uid, wenUrl);
   };
 
+  const handlePopoverOpen = (event: MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handlePopoverClose = () => {
+    setAnchorEl(null);
+  };
+
+  const open = Boolean(anchorEl);
+
   return (
     <div
       style={{
-        width: 200,
-        height: 300,
-        marginRight: 20,
-        marginBottom: 20,
+        width: config.CARD_WIDTH,
+        height: config.CARD_HEIGHT,
+        marginRight: config.CARD_RIGHT_MARGIN,
+        marginBottom: config.CARD_BOTTOM_MARGIN,
         backgroundColor: '#fff',
         borderRadius: 10,
         display: 'flex',
         flexDirection: 'column',
         filter: 'drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.25))',
-      }}>
+      }}
+    >
       <Image
         src="nft.png"
         loader={() => img}
-        height={200}
-        width={200}
+        height={config.CARD_WIDTH}
+        width={config.CARD_WIDTH}
         objectFit="cover"
         alt="nft"
         blurDataURL="/placeholder.jpg"
         placeholder="blur"
         style={{borderTopLeftRadius: 10, borderTopRightRadius: 10}}
+        onMouseEnter={handlePopoverOpen}
+        onMouseLeave={handlePopoverClose}
       />
       <div style={{
         marginLeft: 10,
@@ -48,6 +88,7 @@ const Card: FunctionComponent<CardProps> = ({img, name, rank, onClick, uid, wenU
         fontWeight: 600,
         fontSize: 16,
         color: '#4C5862',
+        minHeight: 40,
       }}>
         {name}
       </div>
@@ -60,10 +101,9 @@ const Card: FunctionComponent<CardProps> = ({img, name, rank, onClick, uid, wenU
           fontWeight: 400,
           fontSize: 14,
           color: '#9E9E9E',
+          minHeight: 60,
         }}>
-          Rank
-          <br />
-          {rank}
+          Rank<br />{rank}
         </div>
         <Button
           onClick={handleOnClick}
@@ -74,10 +114,44 @@ const Card: FunctionComponent<CardProps> = ({img, name, rank, onClick, uid, wenU
             fontWeight: 600,
             fontSize: 16,
             backgroundColor: '#C1C6DC',
+            height: 40,
           }}>
           VIEW
         </Button>
       </div>
+      {properties ? <Popover
+        sx={{
+          pointerEvents: 'none',
+        }}
+        open={open}
+        anchorEl={anchorEl}
+        onClose={handlePopoverClose}
+      >
+        <div
+          style={{
+            minHeight: 300,
+            width: 200,
+            padding: 10,
+            backgroundColor: '#fff',
+            borderRadius: 10,
+            display: 'flex',
+            flexDirection: 'column',
+            fontFamily: 'Inter',
+            fontWeight: 400,
+            fontSize: 14,
+            color: '#9E9E9E',
+          }}>
+          {price ? (<div style={{marginBottom: 5}}><strong>Price</strong><br />{formatPrice(price)}<br /></div>) : null}
+          {Object.keys(properties).map((key: string) => {
+            return (
+              <div key={key} style={{marginBottom: 5}}>
+                <strong>{sanitizeKey(key)}</strong>
+                <br />
+                {properties[key].value}
+              </div>);
+          })}
+        </div>
+      </Popover> : null}
     </div>
   );
 };
