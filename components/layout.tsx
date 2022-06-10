@@ -12,7 +12,7 @@ const Layout: FunctionComponent<LayoutProps> = ({user, loading = false, children
   return (
     <>
       <Head>
-        <title>IOTA NFT TOOLS</title>
+        <title>TangleRarity</title>
         <meta name="description" content="Explore your NFTs rarity" />
         <link rel="icon" href="/favicon.ico" />
         <link

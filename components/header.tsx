@@ -46,7 +46,7 @@ const Header: FunctionComponent = () => {
               marginLeft: 30,
             }}
           >
-            <Link href="/">IOTA NFT TOOLS</Link>
+            <Link href="/">TangleRarity</Link>
           </Typography>
         </div>
         <div className="search-input" style={{flexGrow: 1}}>
