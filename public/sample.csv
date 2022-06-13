@@ -1,2 +1,2 @@
-﻿media,name,uid,prop.label1,prop.value1
-0.png,Meowta #0000,0x0000000000000000000000000000000000000000,clan,imagawa
+﻿media,name,uid,prop.label1,prop.value1,prop.label2,prop.value2
+http://cdn.suwalls.com/wallpapers/meme/nyan-cat-9089-1920x1080.jpg,Nyancat,0x0000000000000000000000000000000000000000,type,neoncat,additional label, additional value (add as many as you like)
