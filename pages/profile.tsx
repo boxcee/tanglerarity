@@ -18,7 +18,7 @@ const ProfileCard: FunctionComponent<ProfileCardProps> = ({user}) => {
 
       <div>
         <h3>Profile (client rendered)</h3>
-        <Image height={64} width={64} src={`https://res.cloudinary.com/dspyhe3iz/image/fetch/${user.picture}`} alt="user picture" />
+        <Image height={64} width={64} src={user.picture} alt="user picture" />
         <p>nickname: {user.nickname}</p>
         <p>name: {user.name}</p>
       </div>

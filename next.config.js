@@ -5,7 +5,8 @@ const nextConfig = {
     outputStandalone: true,
   },
   images: {
-    domains: ['res.cloudinary.com'],
+    loader: 'cloudinary',
+    path: 'https://res.cloudinary.com/dspyhe3iz/',
   },
 };
 

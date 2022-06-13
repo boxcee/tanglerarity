@@ -70,7 +70,7 @@ const Card: FunctionComponent<CardProps> = (props) => {
     >
       <Image
         src="nft.png"
-        loader={() => `https://res.cloudinary.com/dspyhe3iz/image/fetch/${img}`}
+        loader={() => img}
         height={config.CARD_WIDTH}
         width={config.CARD_WIDTH}
         objectFit="cover"

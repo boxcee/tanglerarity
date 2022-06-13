@@ -148,7 +148,8 @@ const NftsSsr: FunctionComponent<NftsProps> = (props) => {
           </Typography>
           <div style={{marginBottom: '38px', alignSelf: 'center'}}>
             {bannerUrl && <Image
-              src={`https://res.cloudinary.com/dspyhe3iz/image/fetch/${bannerUrl}`}
+              loader={() => bannerUrl}
+              src="banner.png"
               alt="banner img"
               height={200}
               width={200}
