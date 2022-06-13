@@ -5,7 +5,7 @@ const nextConfig = {
     outputStandalone: true,
   },
   images: {
-    domains: ['lh3.googleusercontent.com', 'firebasestorage.googleapis.com'],
+    domains: ['res.cloudinary.com'],
   },
 };
 

@@ -80,7 +80,7 @@ const CollectionsView = () => {
                     <div style={{width: 80}}>
                       <Image
                         placeholder="blur"
-                        src={collection.bannerUrl}
+                        src={`https://res.cloudinary.com/dspyhe3iz/image/fetch/${collection.bannerUrl}`}
                         alt="banner"
                         height={40}
                         width={60}

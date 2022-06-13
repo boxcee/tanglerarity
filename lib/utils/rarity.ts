@@ -75,10 +75,10 @@ const getRarities = (nfts: RankedNft[]): Rarities => {
     }, {} as Rarities);
 };
 
-const enrichNfts = (rarities: Rarities, nfts: Nft[]): RankedNft[] => {
+const enrichNfts = (rarities: Rarities, nfts: Nft[], additionalProperties: { [key: string]: string } = {}): RankedNft[] => {
   return nfts.map((nft: Nft, idx: number): RankedNft => {
     const {rarity, score, rank} = rarities[getNameWithNumber(nft.name, idx)];
-    return {...nft, rarity, score, rank};
+    return {...nft, rarity, score, rank, ...additionalProperties};
   });
 };
 

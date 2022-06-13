@@ -13,7 +13,7 @@ const NftCards: FunctionComponent<NftCardsProps> = ({total, nfts}) => {
   };
 
   const cards = useMemo(() => (
-    nfts.map((nft: RankedNft, idx: number) => (
+    nfts.map((nft: any, idx: number) => (
       <Card
         key={`${nft.name}${idx}`}
         img={nft.media}
@@ -23,6 +23,7 @@ const NftCards: FunctionComponent<NftCardsProps> = ({total, nfts}) => {
         wenUrl={nft.wenUrl}
         price={nft.availablePrice}
         properties={nft.properties}
+        type={nft.uploadType}
         onClick={handleInfoClick}
       />
     ))

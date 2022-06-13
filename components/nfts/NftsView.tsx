@@ -138,7 +138,7 @@ const NftsView: FunctionComponent<NftsViewProps> = ({collectionId}) => {
         </Typography>
         <div style={{marginBottom: '38px', alignSelf: 'center'}}>
           <Image
-            src={data.bannerUrl}
+            src={`https://res.cloudinary.com/dspyhe3iz/image/fetch/${data.bannerUrl}`}
             alt="banner img"
             height={200}
             width={200}

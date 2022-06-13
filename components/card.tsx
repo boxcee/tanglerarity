@@ -13,6 +13,7 @@ type CardProps = {
   onClick: (uid: string, wenUrl?: string) => void,
   uid: string,
   wenUrl?: string,
+  type: string,
 };
 
 const formatPrice = (price: number): string => {
@@ -35,7 +36,7 @@ const sanitizeKey = (key: string) => (
 );
 
 const Card: FunctionComponent<CardProps> = (props) => {
-  const {img, name, rank, price, properties, onClick, uid, wenUrl} = props;
+  const {img, name, rank, price, properties, onClick, uid, wenUrl, type} = props;
 
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
 
@@ -69,7 +70,7 @@ const Card: FunctionComponent<CardProps> = (props) => {
     >
       <Image
         src="nft.png"
-        loader={() => img}
+        loader={() => `https://res.cloudinary.com/dspyhe3iz/image/fetch/${img}`}
         height={config.CARD_WIDTH}
         width={config.CARD_WIDTH}
         objectFit="cover"
@@ -105,7 +106,7 @@ const Card: FunctionComponent<CardProps> = (props) => {
         }}>
           Rank<br />{rank}
         </div>
-        <Button
+        {type === 'SOONAVERSE' ? (<Button
           onClick={handleOnClick}
           variant="contained"
           style={{
@@ -117,7 +118,7 @@ const Card: FunctionComponent<CardProps> = (props) => {
             height: 40,
           }}>
           VIEW
-        </Button>
+        </Button>) : null}
       </div>
       {properties ? <Popover
         sx={{
