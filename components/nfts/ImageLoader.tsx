@@ -95,7 +95,7 @@ const ImageLoader = ({collectionId, cardsPerRow, rows, page, filter, total, onLo
       .catch(setError);
   }, [collectionId, cardsPerRow, rows, page, filter, sort]);
 
-  const {items: nfts, total: totalLoaded} = data as ({ items: RankedNft[], total: number });
+  const {items: nfts} = data as ({ items: RankedNft[] });
 
   if (isLoading) {
     return <LinearProgress sx={{m: 1}} />;
@@ -105,7 +105,7 @@ const ImageLoader = ({collectionId, cardsPerRow, rows, page, filter, total, onLo
     return <div>Error when loading collection. If you tried loading the first time, please refresh.</div>;
   }
 
-  onLoaded(totalLoaded);
+  onLoaded(nfts.length);
 
   return <NftCards total={total} nfts={nfts} />;
 };

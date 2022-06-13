@@ -33,7 +33,7 @@ const NftsView: FunctionComponent<NftsViewProps> = ({collectionId}) => {
   const [select, setSelect] = useState({} as ({ [key: string]: string[] }));
   const [sort, setSort] = useState({key: 'rank', order: 'asc'} as ({ [key: string]: string }));
   const [page, setPage] = useState(0);
-  const [totalLoaded, setTotalLoaded] = useState(0);
+  const [totalLoaded, setTotalLoaded] = useState<number | null>(null);
   const {data, error} = useSWR(`/api/collections/${collectionId}`, fetcher);
   const [cardDimensions, setCardDimensions] = useState({
     clientWidth: 0,
@@ -318,12 +318,23 @@ const NftsView: FunctionComponent<NftsViewProps> = ({collectionId}) => {
             onLoaded={handleOnLoaded}
           />
         </div>
-        <div style={{display: 'flex', width: '100%', justifyContent: 'start'}}>
-          <Pagination
-            count={Math.ceil(totalLoaded / (cardCount * ROW_COUNT))}
-            onChange={handleOnPage}
-          />
-        </div>
+        {totalLoaded && totalLoaded !== 0 ? (
+          <div style={{display: 'flex', width: '100%', justifyContent: 'start'}}>
+            <Pagination
+              count={Math.ceil((totalLoaded ? totalLoaded : total) / (cardCount * ROW_COUNT))}
+              onChange={handleOnPage}
+            />
+          </div>
+        ) : (
+          <div
+            style={{
+              fontFamily: 'Montserrat',
+              fontWeight: 500, fontSize: 24,
+            }}
+          >
+            No matching NFTs found.
+          </div>
+        )}
       </div>
     </div>
   );
