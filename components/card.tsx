@@ -2,6 +2,7 @@ import {FunctionComponent, MouseEvent, useState} from 'react';
 import Image from 'next/image';
 import Button from '@mui/material/Button';
 import Popover from '@mui/material/Popover';
+import Tooltip from '@mui/material/Tooltip';
 import config from '../components/config';
 
 type CardProps = {
@@ -53,6 +54,23 @@ const Card: FunctionComponent<CardProps> = (props) => {
   };
 
   const open = Boolean(anchorEl);
+
+  const getButton = () => (
+    <Button
+      onClick={handleOnClick}
+      variant="contained"
+      disabled={type !== 'SOONAVERSE'}
+      style={{
+        marginRight: 10,
+        fontFamily: 'Inter',
+        fontWeight: 600,
+        fontSize: 16,
+        backgroundColor: '#C1C6DC',
+        height: 40,
+      }}>
+      VIEW
+    </Button>
+  );
 
   return (
     <div
@@ -106,23 +124,28 @@ const Card: FunctionComponent<CardProps> = (props) => {
         }}>
           Rank<br />{rank}
         </div>
-        {type === 'SOONAVERSE' ? (<Button
-          onClick={handleOnClick}
-          variant="contained"
-          style={{
-            marginRight: 10,
-            fontFamily: 'Inter',
-            fontWeight: 600,
-            fontSize: 16,
-            backgroundColor: '#C1C6DC',
-            height: 40,
-          }}>
-          VIEW
-        </Button>) : null}
+        {type !== 'SOONAVERSE'
+          ? (
+            <Tooltip title="Not a Soonaverse collection." followCursor>
+            <span>
+              {getButton()}
+            </span>
+            </Tooltip>
+          )
+          : getButton()
+        }
       </div>
       {properties ? <Popover
         sx={{
           pointerEvents: 'none',
+        }}
+        anchorOrigin={{
+          vertical: 'top',
+          horizontal: 'right',
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'left',
         }}
         open={open}
         anchorEl={anchorEl}
