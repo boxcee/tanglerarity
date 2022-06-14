@@ -105,7 +105,11 @@ const NftsView: FunctionComponent<NftsViewProps> = ({collectionId}) => {
     key.replace(/[-_]/, ' ').replace(/(^[a-z])|( [a-z])/g, (str: string) => str.toUpperCase())
   );
 
-  const {rarities, total} = data as EnrichedCollection;
+  const {rarities, total, collectionType} = data as (EnrichedCollection & { collectionType: string });
+
+  const filtersUsed = Object.keys(select)
+    .filter(key => key !== 'availability')
+    .filter(key => select[key] && select[key].length > 0 && select[key][0] !== '').length > 0;
 
   return (
     <div style={{display: 'flex', padding: '20px 0 0 0', margin: '4rem 0 0', height: '100%'}}>
@@ -293,18 +297,19 @@ const NftsView: FunctionComponent<NftsViewProps> = ({collectionId}) => {
               <MenuItem value="desc">Descending</MenuItem>
             </Select>
           </div>
-          <div style={{marginLeft: '50px', width: 215, display: 'flex', alignItems: 'center'}}>
-            <label style={{marginRight: '13px', fontFamily: 'Montserrat', fontWeight: 600}}>Listings</label>
-            <Select
-              value={select['availability'] || 'all'}
-              onChange={(event) => handleOnChange('availability', event)}
-              style={{height: 40, borderRadius: 10, width: 137}}
-            >
-              <MenuItem value="all">All</MenuItem>
-              <MenuItem value="available">Available</MenuItem>
-              <MenuItem value="unavailable">Unavailable</MenuItem>
-            </Select>
-          </div>
+          {collectionType === 'SOONAVERSE' ? (
+            <div style={{marginLeft: '50px', width: 215, display: 'flex', alignItems: 'center'}}>
+              <label style={{marginRight: '13px', fontFamily: 'Montserrat', fontWeight: 600}}>Listings</label>
+              <Select
+                value={select['availability'] || 'all'}
+                onChange={(event) => handleOnChange('availability', event)}
+                style={{height: 40, borderRadius: 10, width: 137}}
+              >
+                <MenuItem value="all">All</MenuItem>
+                <MenuItem value="available">Available</MenuItem>
+                <MenuItem value="unavailable">Unavailable</MenuItem>
+              </Select>
+            </div>) : null}
         </div>
         <div style={{marginTop: 40}} ref={imageContainer}>
           <ImageLoader
@@ -321,7 +326,7 @@ const NftsView: FunctionComponent<NftsViewProps> = ({collectionId}) => {
         {totalLoaded && totalLoaded !== 0 ? (
           <div style={{display: 'flex', width: '100%', justifyContent: 'start'}}>
             <Pagination
-              count={Math.ceil((totalLoaded ? totalLoaded : total) / (cardCount * ROW_COUNT))}
+              count={Math.ceil((filtersUsed ? totalLoaded : total) / (cardCount * ROW_COUNT))}
               onChange={handleOnPage}
             />
           </div>
