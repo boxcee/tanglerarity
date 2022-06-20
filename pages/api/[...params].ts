@@ -14,6 +14,7 @@ const hasSession = async (req: NextApiRequest, res: NextApiResponse): Promise<bo
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const {query: {params, limit, skip, sort, order}, method, body} = req;
   const filter = body ? JSON.parse(body) : {};
+  console.log('FILTER', filter);
   const queryLimit: number = Array.isArray(limit) ? Number(limit[0]) : Number(limit);
   const queryOffset: number = Array.isArray(skip) ? Number(skip[0]) : Number(skip);
   const sortKey: string = Array.isArray(sort) ? sort[0] : sort;

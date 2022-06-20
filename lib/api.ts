@@ -71,27 +71,28 @@ const buildSearchBody = (filter: {}) => {
   const result = {} as { [key: string]: string[] };
   const andFilter = Object.entries(filter)
     .reduce((arr, [key, value]) => {
-      if (key === 'name' && Array.isArray(value) && value.length > 0) {
+      const isNonEmptyArray = Array.isArray(value) && value.length > 0;
+      if (key === 'name' && isNonEmptyArray) {
         return [...arr, {name: {$regex: `${value}`, $options: 'i'}}];
-      } else if (key === 'fromPrice' && Array.isArray(value) && value.length > 0) {
+      } else if (key === 'fromPrice' && isNonEmptyArray) {
         return [...arr, {availablePrice: {$gte: Number(value[0]) * 1000000}}];
-      } else if (key === 'toPrice' && Array.isArray(value) && value.length > 0) {
+      } else if (key === 'toPrice' && isNonEmptyArray) {
         return [...arr, {availablePrice: {$lte: Number(value[0]) * 1000000}}];
-      } else if (key === 'fromRank' && Array.isArray(value) && value.length > 0) {
+      } else if (key === 'fromRank' && isNonEmptyArray) {
         return [...arr, {rank: {$gte: Number(value[0])}}];
-      } else if (key === 'toRank' && Array.isArray(value) && value.length > 0) {
+      } else if (key === 'toRank' && isNonEmptyArray) {
         return [...arr, {rank: {$lte: Number(value[0])}}];
       } else if (key === 'availability') {
-        if (Array.isArray(value) && value.length > 0 && value[0] === 'available') {
+        if (isNonEmptyArray && value[0] === 'available') {
           return [...arr, {available: 1}];
-        } else if (Array.isArray(value) && value.length > 0 && value[0] === 'unavailable') {
+        } else if (isNonEmptyArray && value[0] === 'unavailable') {
           return [...arr, {available: 0}];
         } else {
           return arr;
         }
-      } else if (Array.isArray(value) && value.length > 0) {
+      } else if (isNonEmptyArray && value.filter(v => v !== '').length > 0) {
         return [...arr, {
-          $or: value.map((v) => ({[`properties.${key.toLowerCase()}.value`]: v})),
+          $or: value.map((v) => ({[`properties.${key.replace(' ', '').toLowerCase()}.value`]: v})),
         }];
       } else {
         return arr;
