@@ -179,7 +179,6 @@ const Card: FunctionComponent<CardProps> = (props) => {
           : getButton()
         }
       </div>
-      {popover}
     </div>
   );
 };
