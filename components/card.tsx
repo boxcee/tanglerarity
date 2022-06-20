@@ -132,7 +132,13 @@ const Card: FunctionComponent<CardProps> = (props) => {
     >
       <Image
         src="nft.png"
-        loader={() => img}
+        loader={() => {
+          if (img.indexOf('firebase') > -1) {
+            return `https://res.cloudinary.com/dspyhe3iz/image/fetch/c_fit,h_${config.CARD_HEIGHT},w_${config.CARD_WIDTH}/${encodeURIComponent(img)}`;
+          } else {
+            return img;
+          }
+        }}
         height={config.CARD_WIDTH}
         width={config.CARD_WIDTH}
         objectFit="cover"
