@@ -124,7 +124,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       bannerUrl: collectionBannerUrl,
       rarities,
       rarityMap,
-      uploadType: 'ERC721',
+      collectionType: 'ERC721',
       total: parsed.length,
       sold: parsed.length,
     });
@@ -133,7 +133,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       uid: nft.uid ? nft.uid : `${idx}`,
       collection: collectionId,
     }));
-    await createNfts(collectionId, enrichNfts(rarityMap, nfts, {uploadType: 'ERC721'}));
+    await createNfts(collectionId, enrichNfts(rarityMap, nfts, {collectionType: 'ERC721'}));
     res.status(200).json(rarities);
     return;
   }

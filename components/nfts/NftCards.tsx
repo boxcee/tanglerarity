@@ -23,7 +23,7 @@ const NftCards: FunctionComponent<NftCardsProps> = ({total, nfts}) => {
         wenUrl={nft.wenUrl}
         price={nft.availablePrice}
         properties={nft.properties}
-        type={nft.uploadType}
+        type={nft.collectionType}
         onClick={handleInfoClick}
       />
     ))

@@ -24,7 +24,7 @@ const getOrCreateCollection = async (isAuthorized: boolean, collectionId: string
       console.error(collectionId, 'collection is not a soonaverse collection');
       return null;
     }
-    data = await createCollection({...newCollection, uploadType: 'SOONAVERSE'}, projection);
+    data = await createCollection({...newCollection, collectionType: 'SOONAVERSE'}, projection);
   }
   return data;
 };
@@ -60,7 +60,7 @@ const getOrCreateNfts = async (isAuthorized: boolean, collectionId: string, limi
       const sortedEnrichedNfts = sortEnrichedNfts(enrichedNfts);
       const rankedNfts = getRankedNfts(sortedEnrichedNfts);
       const builtRarities = !collection.rarityMap ? getRarities(rankedNfts) : collection.rarityMap;
-      data = await createNfts(collectionId, enrichNfts(builtRarities, sortedEnrichedNfts, {uploadType: 'SOONAVERSE'}), projection);
+      data = await createNfts(collectionId, enrichNfts(builtRarities, sortedEnrichedNfts, {collectionType: 'SOONAVERSE'}), projection);
     }
   }
 

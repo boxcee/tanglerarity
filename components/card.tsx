@@ -1,4 +1,4 @@
-import {FunctionComponent, MouseEvent, useState} from 'react';
+import {FunctionComponent, MouseEvent, useMemo, useState} from 'react';
 import Image from 'next/image';
 import Button from '@mui/material/Button';
 import Popover from '@mui/material/Popover';
@@ -72,6 +72,50 @@ const Card: FunctionComponent<CardProps> = (props) => {
     </Button>
   );
 
+  const popover = useMemo(() => (
+    properties ? <Popover
+      sx={{
+        pointerEvents: 'none',
+      }}
+      anchorOrigin={{
+        vertical: 'top',
+        horizontal: 'right',
+      }}
+      transformOrigin={{
+        vertical: 'top',
+        horizontal: 'left',
+      }}
+      open={open}
+      anchorEl={anchorEl}
+      onClose={handlePopoverClose}
+    >
+      <div
+        style={{
+          minHeight: 300,
+          width: 200,
+          padding: 10,
+          backgroundColor: '#fff',
+          borderRadius: 10,
+          display: 'flex',
+          flexDirection: 'column',
+          fontFamily: 'Inter',
+          fontWeight: 400,
+          fontSize: 14,
+          color: '#9E9E9E',
+        }}>
+        {price ? (<div style={{marginBottom: 5}}><strong>Price</strong><br />{formatPrice(price)}<br /></div>) : null}
+        {Object.keys(properties).map((key: string) => {
+          return (
+            <div key={key} style={{marginBottom: 5}}>
+              <strong>{sanitizeKey(key)}</strong>
+              <br />
+              {properties[key].value}
+            </div>);
+        })}
+      </div>
+    </Popover> : null
+  ), [properties, anchorEl, open, price]);
+
   return (
     <div
       style={{
@@ -135,47 +179,7 @@ const Card: FunctionComponent<CardProps> = (props) => {
           : getButton()
         }
       </div>
-      {properties ? <Popover
-        sx={{
-          pointerEvents: 'none',
-        }}
-        anchorOrigin={{
-          vertical: 'top',
-          horizontal: 'right',
-        }}
-        transformOrigin={{
-          vertical: 'top',
-          horizontal: 'left',
-        }}
-        open={open}
-        anchorEl={anchorEl}
-        onClose={handlePopoverClose}
-      >
-        <div
-          style={{
-            minHeight: 300,
-            width: 200,
-            padding: 10,
-            backgroundColor: '#fff',
-            borderRadius: 10,
-            display: 'flex',
-            flexDirection: 'column',
-            fontFamily: 'Inter',
-            fontWeight: 400,
-            fontSize: 14,
-            color: '#9E9E9E',
-          }}>
-          {price ? (<div style={{marginBottom: 5}}><strong>Price</strong><br />{formatPrice(price)}<br /></div>) : null}
-          {Object.keys(properties).map((key: string) => {
-            return (
-              <div key={key} style={{marginBottom: 5}}>
-                <strong>{sanitizeKey(key)}</strong>
-                <br />
-                {properties[key].value}
-              </div>);
-          })}
-        </div>
-      </Popover> : null}
+      {popover}
     </div>
   );
 };

@@ -60,10 +60,12 @@ const NftsView: FunctionComponent<NftsViewProps> = ({collectionId}) => {
 
   const handleOnChange = (key: string, event: SelectChangeEvent<string[]>) => {
     const value = Array.isArray(event.target.value) ? event.target.value : [event.target.value];
+    const newValue = value.filter(v => v !== '');
     setSelect({
       ...select,
-      [key]: value.filter(v => v !== ''),
+      [key]: newValue.length === 0 ? [''] : newValue,
     });
+    setPage(0);
   };
 
   const handleOnSort = (key: string, event: SelectChangeEvent<string[]>) => {
@@ -71,6 +73,7 @@ const NftsView: FunctionComponent<NftsViewProps> = ({collectionId}) => {
       ...sort,
       [key]: Array.isArray(event.target.value) ? event.target.value[0] : event.target.value,
     });
+    setPage(0);
   };
 
   let cardCount = CARD_COUNT;
@@ -99,6 +102,7 @@ const NftsView: FunctionComponent<NftsViewProps> = ({collectionId}) => {
       ...prevState,
       [key]: Number.isNaN(Number(event.target.value)) ? ['0'] : [`${event.target.value}`],
     }));
+    setPage(0);
   };
 
   const sanitizeKey = (key: string) => (
@@ -328,9 +332,11 @@ const NftsView: FunctionComponent<NftsViewProps> = ({collectionId}) => {
             <Pagination
               count={Math.ceil((filtersUsed ? totalLoaded : total) / (cardCount * ROW_COUNT))}
               onChange={handleOnPage}
+              page={page + 1}
             />
           </div>
-        ) : (
+        ) : null}
+        {totalLoaded && totalLoaded === 0 ? (
           <div
             style={{
               fontFamily: 'Montserrat',
@@ -339,7 +345,7 @@ const NftsView: FunctionComponent<NftsViewProps> = ({collectionId}) => {
           >
             No matching NFTs found.
           </div>
-        )}
+        ) : null}
       </div>
     </div>
   );

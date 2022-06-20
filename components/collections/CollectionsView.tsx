@@ -123,7 +123,7 @@ const CollectionsView = () => {
           margin: 4rem auto 0 auto;
           background-color: #FFFFFF;
           box-shadow: 0px 0px 8px gray;
-          border-radius: 25px 25px 0 0;
+          border-radius: 25px;
           padding-bottom: 2rem;
         }
         .table-header > tr {
