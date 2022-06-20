@@ -1,8 +1,10 @@
 import {NextApiRequest, NextApiResponse} from 'next';
 import puppeteer from 'puppeteer';
 import PQueue from 'p-queue';
+import {getOrCreateNfts} from '../../lib/api';
+import {getCollection} from '../../lib/mongodb/collections';
 
-const queue = new PQueue({concurrency: 10});
+const queue = new PQueue({concurrency: 2, interval: 60000});
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'GET') {
@@ -35,12 +37,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
     res.status(200).send(urls);
   } else if (req.method === 'POST') {
-    const {body: urls} = req;
-    const port = process.env.PORT || 3000;
-    Promise.all(urls.map(async (url: string) => {
-      return queue.add(() => fetch(`http://localhost:${port}/api/collections/${url}/nfts`));
-    })).then(() => {
-      res.status(201).send('Created');
+    const {body: collectionIds} = req;
+    await Promise.all(collectionIds.map(async (collectionId: string) => {
+      return queue.add(async () => {
+        const collection = await getCollection(collectionId);
+        if (!collection) {
+          await getOrCreateNfts(true, collectionId, 1, 0, 'uid', 1, undefined);
+          return collectionId;
+        }
+        return null;
+      });
+    })).then((createdCollectionIds) => {
+      res.status(201).send(createdCollectionIds.filter(c => c));
     }).catch(error => {
       console.error(error);
       res.status(500).send('Error');

@@ -326,6 +326,26 @@ const NftsView: FunctionComponent<NftsViewProps> = ({collectionId}) => {
             sort={sort}
             onLoaded={handleOnLoaded}
           />
+          {rarities ? null : (
+            <div
+              style={{
+                fontFamily: 'Montserrat',
+                fontWeight: 500, fontSize: 24,
+              }}
+            >
+              This collection has not been fully sold yet. Please ask the owner to upload the rarity data.
+            </div>
+          )}
+          {totalLoaded && totalLoaded === 0 ? (
+            <div
+              style={{
+                fontFamily: 'Montserrat',
+                fontWeight: 500, fontSize: 24,
+              }}
+            >
+              No matching NFTs found.
+            </div>
+          ) : null}
         </div>
         {totalLoaded && totalLoaded !== 0 ? (
           <div style={{display: 'flex', width: '100%', justifyContent: 'start'}}>
@@ -334,16 +354,6 @@ const NftsView: FunctionComponent<NftsViewProps> = ({collectionId}) => {
               onChange={handleOnPage}
               page={page + 1}
             />
-          </div>
-        ) : null}
-        {totalLoaded && totalLoaded === 0 ? (
-          <div
-            style={{
-              fontFamily: 'Montserrat',
-              fontWeight: 500, fontSize: 24,
-            }}
-          >
-            No matching NFTs found.
           </div>
         ) : null}
       </div>
