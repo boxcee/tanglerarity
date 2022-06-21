@@ -33,7 +33,7 @@ const NftsView: FunctionComponent<NftsViewProps> = ({collectionId}) => {
   const [select, setSelect] = useState({} as ({ [key: string]: string[] }));
   const [sort, setSort] = useState({key: 'rank', order: 'asc'} as ({ [key: string]: string }));
   const [page, setPage] = useState(0);
-  const [totalLoaded, setTotalLoaded] = useState<number | null>(null);
+  const [filteredLoaded, setFilteredLoaded] = useState<number | null>(null);
   const {data, error} = useSWR(`/api/collections/${collectionId}`, fetcher);
   const [cardDimensions, setCardDimensions] = useState({
     clientWidth: 0,
@@ -87,10 +87,6 @@ const NftsView: FunctionComponent<NftsViewProps> = ({collectionId}) => {
 
   const handleOnPage = (event: ChangeEvent<unknown>, page: number) => {
     setPage(page - 1);
-  };
-
-  const handleOnLoaded = (n: number) => {
-    setTotalLoaded(n);
   };
 
   const handleOnClick = () => {
@@ -324,7 +320,7 @@ const NftsView: FunctionComponent<NftsViewProps> = ({collectionId}) => {
             filter={select}
             total={total}
             sort={sort}
-            onLoaded={handleOnLoaded}
+            setFiltered={setFilteredLoaded}
           />
           {rarities ? null : (
             <div
@@ -336,7 +332,7 @@ const NftsView: FunctionComponent<NftsViewProps> = ({collectionId}) => {
               This collection has not been fully sold yet. Please ask the owner to upload the rarity data.
             </div>
           )}
-          {totalLoaded && totalLoaded === 0 ? (
+          {filteredLoaded && filteredLoaded === 0 ? (
             <div
               style={{
                 fontFamily: 'Montserrat',
@@ -347,10 +343,10 @@ const NftsView: FunctionComponent<NftsViewProps> = ({collectionId}) => {
             </div>
           ) : null}
         </div>
-        {totalLoaded && totalLoaded !== 0 ? (
+        {filteredLoaded && filteredLoaded !== 0 ? (
           <div style={{display: 'flex', width: '100%', justifyContent: 'start'}}>
             <Pagination
-              count={Math.ceil((filtersUsed ? totalLoaded : total) / (cardCount * ROW_COUNT))}
+              count={Math.ceil((filtersUsed ? filteredLoaded : total) / (cardCount * ROW_COUNT))}
               onChange={handleOnPage}
               page={page + 1}
             />

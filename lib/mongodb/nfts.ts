@@ -25,7 +25,11 @@ const getNfts = async (uid?: string, limit?: number, skip?: number, sort?: strin
     cursor.sort({rank: -1});
   }
   const nfts = await cursor.toArray() as NftDocument[];
-  return {total: await mongo.countDocuments({collection: uid}), items: nfts};
+  return {
+    total: await mongo.countDocuments({collection: uid}),
+    filtered: await mongo.countDocuments({collection: uid, ...filter}),
+    items: nfts,
+  };
 };
 
 const getNft = async (collectionUid: string, uid: string, projection = {}): Promise<NftDocument> => {
@@ -37,11 +41,11 @@ const getNft = async (collectionUid: string, uid: string, projection = {}): Prom
   return nft as NftDocument;
 };
 
-const createNfts = async (uid: string, documents: Document[], projection = {}): Promise<NftDocuments> => {
+const createNfts = async (uid: string, documents: Document[]): Promise<NftDocuments> => {
   const mongo = await collectionHelper;
   const createdDocuments = documents as NftDocument[];
   await mongo.insertMany(createdDocuments);
-  return {total: createdDocuments.length, items: createdDocuments as NftDocument[]};
+  return {total: createdDocuments.length, filtered: createdDocuments.length, items: createdDocuments as NftDocument[]};
 };
 
 export {

@@ -60,7 +60,7 @@ const getOrCreateNfts = async (isAuthorized: boolean, collectionId: string, limi
       const sortedEnrichedNfts = sortEnrichedNfts(enrichedNfts);
       const rankedNfts = getRankedNfts(sortedEnrichedNfts);
       const builtRarities = !collection.rarityMap ? getRarities(rankedNfts) : collection.rarityMap;
-      data = await createNfts(collectionId, enrichNfts(builtRarities, sortedEnrichedNfts, {collectionType: 'SOONAVERSE'}), projection);
+      data = await createNfts(collectionId, enrichNfts(builtRarities, sortedEnrichedNfts, {collectionType: 'SOONAVERSE'}));
     }
   }
 
