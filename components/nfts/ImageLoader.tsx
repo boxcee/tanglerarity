@@ -25,7 +25,7 @@ type ImageLoaderProps = {
   page?: number,
   filter?: {},
   total: number,
-  onLoaded: (n: number) => void,
+  setFiltered: (n: number) => void,
   sort: { [key: string]: string }
 }
 
@@ -69,9 +69,18 @@ const buildSearchBody = (filter: {}): BodyInit => {
 const DEFAULT_CARDS_PER_ROW = 7;
 const DEFAULT_ROWS = 3;
 
-const ImageLoader = ({collectionId, cardsPerRow, rows, page, filter, total, onLoaded, sort}: ImageLoaderProps) => {
+const ImageLoader = ({
+                       collectionId,
+                       cardsPerRow,
+                       rows,
+                       page,
+                       filter,
+                       total,
+                       setFiltered,
+                       sort,
+                     }: ImageLoaderProps) => {
   const [isLoading, setLoading] = useState(false);
-  const [data, setData] = useState({total: 0, items: []});
+  const [data, setData] = useState({total: 0, filtered: 0, items: []});
   const [error, setError] = useState(null);
 
   useEffect(() => {
@@ -96,7 +105,7 @@ const ImageLoader = ({collectionId, cardsPerRow, rows, page, filter, total, onLo
       .catch(setError);
   }, [collectionId, cardsPerRow, rows, page, filter, sort]);
 
-  const {items: nfts} = data as ({ items: RankedNft[] });
+  const {items: nfts, filtered} = data as ({ items: RankedNft[], filtered: 0 });
 
   if (isLoading) {
     return <LinearProgress sx={{m: 1}} />;
@@ -106,7 +115,7 @@ const ImageLoader = ({collectionId, cardsPerRow, rows, page, filter, total, onLo
     return <div>Error when loading collection. If you tried loading the first time, please refresh.</div>;
   }
 
-  onLoaded(nfts.length);
+  setFiltered(filtered);
 
   return <NftCards total={total} nfts={nfts} />;
 };
