@@ -19,7 +19,7 @@ type CardProps = {
 
 const formatPrice = (price: number): string => {
   let mi = price / 1000000;
-  let result = '';
+  let result;
   if (mi >= 1000000) {
     mi = mi / 1000000;
     result = 'Ti';
@@ -134,7 +134,7 @@ const Card: FunctionComponent<CardProps> = (props) => {
         src="nft.png"
         loader={() => {
           if (img.indexOf('firebase') > -1) {
-            return `https://res.cloudinary.com/dspyhe3iz/image/fetch/c_fit,h_${config.CARD_HEIGHT},w_${config.CARD_WIDTH}/${encodeURIComponent(img)}`;
+            return `https://res.cloudinary.com/dspyhe3iz/image/fetch/f_auto,c_fit,h_${config.CARD_HEIGHT},w_${config.CARD_WIDTH}/${encodeURIComponent(img)}`;
           } else {
             return img;
           }
