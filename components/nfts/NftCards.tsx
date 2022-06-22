@@ -25,6 +25,7 @@ const NftCards: FunctionComponent<NftCardsProps> = ({total, nfts}) => {
         properties={nft.properties}
         type={nft.collectionType}
         onClick={handleInfoClick}
+        score={nft.score}
       />
     ))
   ), [nfts, total]);

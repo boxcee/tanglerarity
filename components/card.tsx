@@ -15,6 +15,7 @@ type CardProps = {
   uid: string,
   wenUrl?: string,
   type: string,
+  score: number,
 };
 
 const formatPrice = (price: number): string => {
@@ -37,7 +38,7 @@ const sanitizeKey = (key: string) => (
 );
 
 const Card: FunctionComponent<CardProps> = (props) => {
-  const {img, name, rank, price, properties, onClick, uid, wenUrl, type} = props;
+  const {img, name, rank, price, properties, onClick, uid, wenUrl, type, score} = props;
 
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
 
@@ -66,7 +67,8 @@ const Card: FunctionComponent<CardProps> = (props) => {
         fontWeight: 600,
         fontSize: 16,
         backgroundColor: '#C1C6DC',
-        height: 40,
+        height: 60,
+        width: 60,
       }}>
       VIEW
     </Button>
@@ -172,7 +174,11 @@ const Card: FunctionComponent<CardProps> = (props) => {
           color: '#9E9E9E',
           minHeight: 60,
         }}>
-          Rank<br />{rank}
+          <strong>#</strong>: {rank}
+          <br />
+          <strong>Score</strong>: {score.toFixed(2)}
+          <br />
+          <strong>Price</strong>: {price ? formatPrice(price) : 'N/A'}
         </div>
         {type !== 'SOONAVERSE'
           ? (
