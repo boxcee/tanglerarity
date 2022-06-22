@@ -322,16 +322,6 @@ const NftsView: FunctionComponent<NftsViewProps> = ({collectionId}) => {
             sort={sort}
             setFiltered={setFilteredLoaded}
           />
-          {rarities ? null : (
-            <div
-              style={{
-                fontFamily: 'Montserrat',
-                fontWeight: 500, fontSize: 24,
-              }}
-            >
-              This collection has not been fully sold yet. Please ask the owner to upload the rarity data.
-            </div>
-          )}
           {filteredLoaded && filteredLoaded === 0 ? (
             <div
               style={{

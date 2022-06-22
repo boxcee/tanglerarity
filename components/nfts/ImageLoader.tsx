@@ -81,7 +81,7 @@ const ImageLoader = ({
                      }: ImageLoaderProps) => {
   const [isLoading, setLoading] = useState(false);
   const [data, setData] = useState({total: 0, filtered: 0, items: []});
-  const [error, setError] = useState(null);
+  const [loadingError, setLoadingError] = useState(null);
 
   useEffect(() => {
     const params = {
@@ -100,19 +100,32 @@ const ImageLoader = ({
       .then(data => {
         setData(data);
         setLoading(false);
-        setError(null);
+        setLoadingError(null);
       })
-      .catch(setError);
+      .catch(setLoadingError);
   }, [collectionId, cardsPerRow, rows, page, filter, sort]);
 
-  const {items: nfts, filtered} = data as ({ items: RankedNft[], filtered: 0 });
+  const {items: nfts, filtered, error} = data as { items: RankedNft[], filtered: number, error?: string };
 
   if (isLoading) {
     return <LinearProgress sx={{m: 1}} />;
   }
 
-  if (error) {
+  if (loadingError) {
     return <div>Error when loading collection. If you tried loading the first time, please refresh.</div>;
+  }
+
+  if (error) {
+    return (
+      <div
+        style={{
+          fontFamily: 'Montserrat',
+          fontWeight: 500, fontSize: 24,
+        }}
+      >
+        {error}
+      </div>
+    );
   }
 
   setFiltered(filtered);

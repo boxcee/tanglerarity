@@ -6,6 +6,7 @@ type NftDocument = WithId<Nft>;
 type NftDocuments = {
   total: number,
   filtered: number,
+  error?: string,
   items: NftDocument[]
 }
 

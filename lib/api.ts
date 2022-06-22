@@ -12,8 +12,10 @@ import {
 import {createCollection, getCollection, updateCollection} from './mongodb/collections';
 import {Soon} from 'soonaverse';
 import {CollectionDocument} from './mongodb/types/Collection';
+import blacklist from '../blacklist.json';
 
 const soon = new Soon();
+const collectionBlacklist = blacklist as { [key: string]: string };
 
 const getOrCreateCollection = async (isAuthorized: boolean, collectionId: string, filter = {}): Promise<CollectionDocument | null> => {
   const projection = !isAuthorized ? {rarities: 0, rarityMap: 0} : {};
@@ -32,10 +34,23 @@ const getOrCreateCollection = async (isAuthorized: boolean, collectionId: string
 const getOrCreateNfts = async (isAuthorized: boolean, collectionId: string, limit: number, skip: number, sort: string, order: number, filter = {}): Promise<NftDocuments | RankedNftDocuments> => {
   const collection = await getOrCreateCollection(isAuthorized, collectionId);
   if (!collection) {
-    return {total: 0, items: []};
+    return {total: 0, filtered: 0, items: [], error: 'Collection does not exist on Soonaverse.'};
   } else if (!collection.rarities && collection.total !== collection.sold) {
     console.error(collection.name, collection.uid, 'collection not fully minted');
-    return {total: 0, items: []};
+    return {
+      total: 0,
+      filtered: 0,
+      items: [],
+      error: 'This collection has not been fully sold yet. Please ask the owner to upload the rarity data.',
+    };
+  } else if (Object.keys(blacklist).includes(collectionId)) {
+    console.error(collection.name, collection.uid, 'collection blacklisted', collectionBlacklist[collectionId]);
+    return {
+      total: 0,
+      filtered: 0,
+      items: [],
+      error: collectionBlacklist[collectionId],
+    };
   }
 
   // Get NFT data
