@@ -3,6 +3,7 @@ import puppeteer from 'puppeteer';
 import PQueue from 'p-queue';
 import {getOrCreateNfts} from '../../lib/api';
 import {getCollection} from '../../lib/mongodb/collections';
+import {getNfts} from '../../lib/mongodb/nfts';
 
 const queue = new PQueue({concurrency: 2, interval: 60000});
 
@@ -41,7 +42,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     await Promise.all(collectionIds.map(async (collectionId: string) => {
       return queue.add(async () => {
         const collection = await getCollection(collectionId);
-        if (!collection) {
+        const {total} = await getNfts(collectionId, 1, 0, 'uid', 1, undefined, undefined);
+        if (!collection || total === 0) {
           await getOrCreateNfts(true, collectionId, 1, 0, 'uid', 1, undefined);
           return collectionId;
         }

@@ -1,15 +1,16 @@
 import {NftDocument, NftDocuments} from './types/Nft';
-import {Document, Filter, Sort} from 'mongodb';
+import {AnyBulkWriteOperation, Document, Filter, Sort} from 'mongodb';
 import config from './config';
 import * as utils from './utils';
+import {Nft} from 'soonaverse/dist/interfaces/models/nft';
 
 const collectionHelper = utils.collectionHelper<NftDocument>(config.DB_NAME, config.NFTS_COLLECTION_NAME);
 
-const getNfts = async (uid?: string, limit?: number, skip?: number, sort?: string, order?: number, filter = {}, projection = {}): Promise<NftDocuments> => {
+const getNfts = async (collectionId?: string, limit?: number, skip?: number, sort?: string, order?: number, filter = {}, projection = {}): Promise<NftDocuments> => {
   const mongo = await collectionHelper;
   let cursor;
-  if (uid) {
-    cursor = await mongo.find({collection: uid, ...filter}, {projection});
+  if (collectionId) {
+    cursor = await mongo.find({collection: collectionId, ...filter}, {projection});
   } else {
     cursor = await mongo.find(filter, {projection});
   }
@@ -26,8 +27,8 @@ const getNfts = async (uid?: string, limit?: number, skip?: number, sort?: strin
   }
   const nfts = await cursor.toArray() as NftDocument[];
   return {
-    total: await mongo.countDocuments({collection: uid}),
-    filtered: await mongo.countDocuments({collection: uid, ...filter}),
+    total: await mongo.countDocuments({collection: collectionId}),
+    filtered: await mongo.countDocuments({collection: collectionId, ...filter}),
     items: nfts,
   };
 };
@@ -48,8 +49,20 @@ const createNfts = async (uid: string, documents: Document[]): Promise<NftDocume
   return {total: createdDocuments.length, filtered: createdDocuments.length, items: createdDocuments as NftDocument[]};
 };
 
+const updateNfts = async (collectionId: string, nfts: Nft[]) => {
+  const mongo = await collectionHelper;
+  const bulkWriteOperations: AnyBulkWriteOperation<NftDocument>[] = nfts.map(nft => ({
+    updateOne: {
+      filter: {collection: collectionId, uid: nft.uid},
+      update: {$set: {availablePrice: nft.availablePrice}},
+    },
+  }));
+  await mongo.bulkWrite(bulkWriteOperations);
+};
+
 export {
   getNfts,
   createNfts,
   getNft,
+  updateNfts,
 };
