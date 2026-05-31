@@ -49,6 +49,7 @@ type NftsProps = {
   collectionId: string,
   rarities?: { [key: string]: { [key: string]: number } },
   total: number,
+  filtered: number,
   nfts: RankedNft[],
   filter: SearchFilter,
   select: FieldSelect,
@@ -75,7 +76,7 @@ const getSearchParams = (searchParams: SearchParams): string => {
 };
 
 const NftsSsr: FunctionComponent<NftsProps> = (props) => {
-  const {name, bannerUrl, collectionId, rarities, filter, select, nfts, total} = props;
+  const {name, bannerUrl, collectionId, rarities, filter, select, nfts, total, filtered} = props;
 
   const router = useRouter();
   const imageContainer = useRef(null);
@@ -324,7 +325,7 @@ const NftsSsr: FunctionComponent<NftsProps> = (props) => {
           </div>
           <div style={{display: 'flex', width: '100%', justifyContent: 'start'}}>
             <Pagination
-              count={Math.ceil(1000 / (cardCount * ROW_COUNT))} //TODO
+              count={Math.ceil(filtered / (cardCount * ROW_COUNT)) || 1}
               onChange={handleOnPage}
               page={filter['page'] ? Number(filter['page']) : 1}
             />
@@ -368,6 +369,7 @@ export async function getServerSideProps({res, query}: ServerSideProps) {
     select,
     nfts: [],
     total: 0,
+    filtered: 0,
     collectionId: collectionId as string,
   };
 
@@ -443,7 +445,7 @@ export async function getServerSideProps({res, query}: ServerSideProps) {
   );
 
   if (nftData && nftData.items.length > 0) {
-    const {items, total} = nftData;
+    const {items, total, filtered} = nftData;
 
     // _id cannot be serialized
     items.forEach((item: any) => {
@@ -453,6 +455,7 @@ export async function getServerSideProps({res, query}: ServerSideProps) {
     props = {
       ...props,
       total,
+      filtered,
       nfts: (items as RankedNft[]) || [],
     };
   }
